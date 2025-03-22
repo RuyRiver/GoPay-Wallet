@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import Header from "./Header";
 import Tabs from "./Tabs";
@@ -6,7 +5,6 @@ import TokensList from "./TokensList";
 import ActionButtons from "./ActionButtons";
 import ChatInput from "./ChatInput";
 import ChatScreen from "./ChatScreen";
-
 const WalletScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState("tokens");
   const [showChatScreen, setShowChatScreen] = useState(false);
@@ -25,27 +23,20 @@ const WalletScreen: React.FC = () => {
   }
   // Additional tokens could be added here
   ];
-
   const handleSendMessage = (message: string) => {
     console.log("Sending message:", message);
     // Implement message sending logic here
   };
-
   const handleActionButton = (action: string) => {
     console.log(`${action} button clicked`);
     // Implement action button logic here
   };
-
   if (showChatScreen) {
-    return (
-      <div className="bg-white h-full max-w-[480px] w-full overflow-hidden mx-auto">
+    return <div className="bg-white h-full max-w-[480px] w-full overflow-hidden mx-auto">
         <ChatScreen onClose={() => setShowChatScreen(false)} />
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className="bg-[rgba(243,245,246,1)] flex max-w-[480px] w-full flex-col overflow-hidden items-stretch mx-auto pt-[53px]">
+  return <div className="bg-[rgba(243,245,246,1)] flex max-w-[480px] w-full flex-col overflow-hidden items-stretch mx-auto pt-[53px]">
       <Header username="Username" balance="$2,663.56" />
 
       <div className="bg-white border flex min-h-[625px] w-full flex-col items-center pt-5 pb-[132px] px-[27px] rounded-[20px] border-[rgba(237,237,237,1)] border-solid">
@@ -54,19 +45,14 @@ const WalletScreen: React.FC = () => {
         {activeTab === "tokens" ? <>
             <TokensList tokens={tokens} />
             <ActionButtons onSend={() => handleActionButton("Send")} onReceive={() => handleActionButton("Receive")} onDeposit={() => handleActionButton("Deposit")} onSwap={() => handleActionButton("Swap")} />
-          </> : <div className="flex items-center justify-center h-full w-full">
+          </> : <div className="relative self-stretch flex items-center justify-center h-full w-full py-0">
             <p className="text-gray-500">
               Transaction history will appear here
             </p>
           </div>}
       </div>
 
-      <ChatInput 
-        onSendMessage={handleSendMessage} 
-        onInputClick={() => setShowChatScreen(true)}
-      />
-    </div>
-  );
+      <ChatInput onSendMessage={handleSendMessage} onInputClick={() => setShowChatScreen(true)} />
+    </div>;
 };
-
 export default WalletScreen;
