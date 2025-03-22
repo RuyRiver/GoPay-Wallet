@@ -5,13 +5,19 @@ import TokensList from "./TokensList";
 import ActionButtons from "./ActionButtons";
 import ChatInput from "./ChatInput";
 import ChatScreen from "./ChatScreen";
+import SendScreen from "./SendScreen";
+import ReceiveScreen from "./ReceiveScreen";
+import DepositScreen from "./DepositScreen";
+import SwapScreen from "./SwapScreen";
+import SettingsScreen from "./SettingsScreen";
 import { useWeb3Auth } from "@/context/Web3AuthContext";
 import { requestAirdrop } from "@/utils/aptos";
 
 const WalletScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState("tokens");
   const [showChatScreen, setShowChatScreen] = useState(false);
-  const { aptosBalance, aptosAddress, userInfo, getBalance, aptosAccount } = useWeb3Auth();
+  const [currentView, setCurrentView] = useState<"main" | "send" | "receive" | "deposit" | "swap" | "settings">("main");
+  const { aptosBalance, aptosAddress, userInfo, getBalance, aptosAccount, logout } = useWeb3Auth();
 
   // Format the balance to a human-readable format
   const formatBalance = (balance: number) => {
@@ -65,57 +71,89 @@ const WalletScreen: React.FC = () => {
   const handleActionButton = async (action: string) => {
     console.log(`${action} button clicked`);
     
-    if (action === "Deposit" && aptosAddress) {
-      try {
-        const success = await requestAirdrop(aptosAddress);
-        if (success) {
-          alert("Airdrop requested successfully! It may take a few moments to reflect in your balance.");
-          // Refresh balance after a short delay
-          setTimeout(() => {
-            getBalance();
-          }, 5000);
-        } else {
-          alert("Failed to request airdrop. Please try again later.");
-        }
-      } catch (error) {
-        console.error("Error requesting airdrop:", error);
-        alert("Error requesting airdrop. Please try again later.");
-      }
+    switch (action) {
+      case "Send":
+        setCurrentView("send");
+        break;
+      case "Receive":
+        setCurrentView("receive");
+        break;
+      case "Deposit":
+        setCurrentView("deposit");
+        break;
+      case "Swap":
+        setCurrentView("swap");
+        break;
+      case "Settings":
+        setCurrentView("settings");
+        break;
     }
   };
 
-  if (showChatScreen) {
-    return <div className="bg-white h-full max-w-[480px] w-full overflow-hidden mx-auto">
-        <ChatScreen onClose={() => setShowChatScreen(false)} />
-      </div>;
-  }
+  // Handle logout
+  const handleLogout = async () => {
+    await logout();
+  };
 
-  return <div className="bg-[rgba(243,245,246,1)] flex max-w-[480px] w-full flex-col overflow-hidden items-stretch mx-auto pt-[53px]">
-      <Header 
-        username={userInfo?.name || "User"} 
-        balance={`$${totalUsdBalance}`} 
-      />
+  // Render the appropriate view based on currentView state
+  const renderView = () => {
+    if (showChatScreen) {
+      return <ChatScreen onClose={() => setShowChatScreen(false)} />;
+    }
 
-      <div className="bg-white border flex min-h-[625px] w-full flex-col items-center pt-5 pb-[132px] px-[27px] rounded-[20px] border-[rgba(237,237,237,1)] border-solid">
-        <Tabs activeTab={activeTab} onTabChange={setActiveTab} />
-
-        {activeTab === "tokens" ? <>
-            <TokensList tokens={tokens} />
-            <ActionButtons 
-              onSend={() => handleActionButton("Send")} 
-              onReceive={() => handleActionButton("Receive")} 
-              onDeposit={() => handleActionButton("Deposit")} 
-              onSwap={() => handleActionButton("Swap")} 
+    switch (currentView) {
+      case "send":
+        return <SendScreen onClose={() => setCurrentView("main")} />;
+      case "receive":
+        return <ReceiveScreen onClose={() => setCurrentView("main")} />;
+      case "deposit":
+        return <DepositScreen onClose={() => setCurrentView("main")} />;
+      case "swap":
+        return <SwapScreen onClose={() => setCurrentView("main")} />;
+      case "settings":
+        return <SettingsScreen onClose={() => setCurrentView("main")} onLogout={handleLogout} />;
+      default:
+        return (
+          <>
+            <Header 
+              username={userInfo?.name || "User"} 
+              balance={`$${totalUsdBalance}`}
+              onSettingsClick={() => handleActionButton("Settings")}
             />
-          </> : <div className="relative self-stretch flex items-center justify-center h-full w-full py-0">
-            <p className="text-gray-500">
-              Transaction history will appear here
-            </p>
-          </div>}
-      </div>
 
-      <ChatInput onSendMessage={handleSendMessage} onInputClick={() => setShowChatScreen(true)} />
-    </div>;
+            <div className="bg-white border flex min-h-[625px] w-full flex-col items-center pt-5 pb-[132px] px-[27px] rounded-[20px] border-[rgba(237,237,237,1)] border-solid">
+              <Tabs activeTab={activeTab} onTabChange={setActiveTab} />
+
+              {activeTab === "tokens" ? (
+                <>
+                  <TokensList tokens={tokens} />
+                  <ActionButtons 
+                    onSend={() => handleActionButton("Send")} 
+                    onReceive={() => handleActionButton("Receive")} 
+                    onDeposit={() => handleActionButton("Deposit")} 
+                    onSwap={() => handleActionButton("Swap")} 
+                  />
+                </>
+              ) : (
+                <div className="relative self-stretch flex items-center justify-center h-full w-full py-0">
+                  <p className="text-gray-500">
+                    Transaction history will appear here
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <ChatInput onSendMessage={handleSendMessage} onInputClick={() => setShowChatScreen(true)} />
+          </>
+        );
+    }
+  };
+
+  return (
+    <div className="bg-[rgba(243,245,246,1)] flex max-w-[480px] w-full flex-col overflow-hidden items-stretch mx-auto pt-[53px] h-full">
+      {renderView()}
+    </div>
+  );
 };
 
 export default WalletScreen;
