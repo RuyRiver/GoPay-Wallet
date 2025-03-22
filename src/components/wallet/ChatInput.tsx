@@ -17,7 +17,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, onInputClick }) =>
   };
 
   return (
-    <div className="z-10 flex mt-[-109px] w-full items-center gap-6 pt-5 pb-[41px] px-7 border-[rgba(244,244,244,1)] border-t">
+    <div className="z-10 fixed bottom-0 w-full max-w-[480px] mx-auto flex items-center gap-6 pt-5 pb-[41px] px-7 border-[rgba(244,244,244,1)] border-t bg-[rgba(243,245,246,1)]">
       <div 
         className="bg-[rgba(232,232,232,1)] shadow-[20px_20px_60px_rgba(197,197,197,1)] self-stretch flex min-w-60 items-center gap-2.5 text-[13px] text-[rgba(117,117,117,1)] font-normal flex-1 shrink basis-[0%] my-auto px-4 py-[15px] rounded-2xl cursor-pointer"
         onClick={onInputClick}

@@ -164,7 +164,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onClose }) => {
   };
 
   return (
-    <div className="bg-white flex flex-col h-full w-full max-w-[480px] mx-auto animate-slide-in-up overflow-hidden">
+    <div className="bg-white flex flex-col h-screen w-full max-w-[480px] mx-auto animate-slide-in-up overflow-hidden">
       {/* Header */}
       <div className="flex items-center px-6 py-8">
         <Button variant="ghost" size="icon" onClick={onClose} className="p-0 h-auto w-auto hover:bg-transparent">
@@ -174,7 +174,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onClose }) => {
       </div>
 
       {!chatStarted ? (
-        <>
+        <div className="flex flex-col flex-1">
           {/* Bot avatar for welcome screen */}
           <div className="flex justify-center mt-4 mb-10">
             <img 
@@ -208,19 +208,21 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onClose }) => {
               onClick={() => handleSuggestionClick("Please send 100 USDT to elias.soria.juan.manuel@gmail.com")}
             />
           </div>
-        </>
+        </div>
       ) : (
-        <ScrollArea className="flex-1 pb-4">
-          <div className="flex flex-col">
-            {messages.map((message) => (
-              message.sender === 'user' ? (
-                <UserMessage key={message.id} content={message.content} />
-              ) : (
-                <BotMessage key={message.id} content={message.content} />
-              )
-            ))}
-          </div>
-        </ScrollArea>
+        <div className="flex-1 flex flex-col h-full">
+          <ScrollArea className="flex-1">
+            <div className="flex flex-col">
+              {messages.map((message) => (
+                message.sender === 'user' ? (
+                  <UserMessage key={message.id} content={message.content} />
+                ) : (
+                  <BotMessage key={message.id} content={message.content} />
+                )
+              ))}
+            </div>
+          </ScrollArea>
+        </div>
       )}
 
       {/* Chat input */}
