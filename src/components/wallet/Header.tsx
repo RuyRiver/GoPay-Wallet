@@ -1,37 +1,22 @@
-
 import React from "react";
 import { Settings, ScanSearch } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
 interface HeaderProps {
   username: string;
   balance: string;
 }
-
-const Header: React.FC<HeaderProps> = ({ username, balance }) => {
-  return (
-    <div className="flex flex-col self-center relative aspect-[0.975] w-full max-w-[312px] text-center pb-[149px]">
-      <img
-        src="https://cdn.builder.io/api/v1/image/assets/20e65f047558427aa511c5569cf902c1/f9927576fb062199e2c461e3868414cd8527b166?placeholderIfAbsent=true"
-        className="absolute h-full w-full object-cover inset-0"
-        alt="Background"
-      />
-      <div className="relative flex w-full items-center text-2xl text-black font-bold whitespace-nowrap justify-between px-5 py-3">
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="p-0 h-auto w-auto" 
-          aria-label="Account Settings"
-        >
+const Header: React.FC<HeaderProps> = ({
+  username,
+  balance
+}) => {
+  return <div className="flex flex-col self-center relative aspect-[0.975] w-full max-w-[312px] text-center pb-[149px]">
+      <img src="https://cdn.builder.io/api/v1/image/assets/20e65f047558427aa511c5569cf902c1/f9927576fb062199e2c461e3868414cd8527b166?placeholderIfAbsent=true" className="absolute h-full w-full object-cover inset-0" alt="Background" />
+      <div className="relative self-stretch flex w-full items-center text-2xl text-black font-bold whitespace-nowrap justify-between px-5 py-3">
+        <Button variant="ghost" size="icon" className="p-0 h-auto w-auto" aria-label="Account Settings">
           <Settings className="w-5 h-5 stroke-[1.5px]" />
         </Button>
         <div className="self-stretch my-auto">{username}</div>
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="p-0 h-auto w-auto" 
-          aria-label="Scan"
-        >
+        <Button variant="ghost" size="icon" className="p-0 h-auto w-auto" aria-label="Scan">
           <ScanSearch className="w-5 h-5 stroke-[1.5px]" />
         </Button>
       </div>
@@ -41,8 +26,6 @@ const Header: React.FC<HeaderProps> = ({ username, balance }) => {
           {balance}
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Header;
