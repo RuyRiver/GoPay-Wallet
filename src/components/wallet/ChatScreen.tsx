@@ -1,12 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ChevronLeft, ThumbsUp, ThumbsDown, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar } from "@/components/ui/avatar";
+import moveAgentService from "@/services/moveAgentService";
 
 interface ChatScreenProps {
   onClose: () => void;
+  walletAddress?: string;
 }
 
 interface Message {
@@ -70,15 +72,44 @@ const BotMessage: React.FC<{ content: string }> = ({ content }) => (
   </div>
 );
 
-const ChatScreen: React.FC<ChatScreenProps> = ({ onClose }) => {
+const ChatScreen: React.FC<ChatScreenProps> = ({ onClose, walletAddress }) => {
   const [inputValue, setInputValue] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [chatStarted, setChatStarted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [serviceStatus, setServiceStatus] = useState<'checking' | 'online' | 'offline'>('checking');
 
-  const handleSendMessage = () => {
-    if (!inputValue.trim()) return;
+  // Verificar estado del servicio al cargar
+  useEffect(() => {
+    const checkServiceStatus = async () => {
+      try {
+        const status = await moveAgentService.checkStatus();
+        setServiceStatus(status.status === 'ok' ? 'online' : 'offline');
+      } catch (error) {
+        console.error('Error al verificar el estado del servicio:', error);
+        setServiceStatus('offline');
+      }
+    };
+
+    checkServiceStatus();
+  }, []);
+
+  const handleSendMessage = async () => {
+    if (!inputValue.trim() || isLoading) return;
     
-    // Add user message
+    // Verificar si el servicio está disponible
+    if (serviceStatus === 'offline') {
+      const errorMessage: Message = {
+        id: Date.now().toString(),
+        content: "Lo siento, el servicio de Move Agent no está disponible en este momento. Por favor, inténtalo más tarde.",
+        sender: 'bot',
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+      return;
+    }
+    
+    // Agregar mensaje del usuario
     const userMessage: Message = {
       id: Date.now().toString(),
       content: inputValue,
@@ -89,76 +120,46 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onClose }) => {
     setMessages(prev => [...prev, userMessage]);
     setInputValue("");
     setChatStarted(true);
+    setIsLoading(true);
     
-    // Simulate bot response
-    setTimeout(() => {
-      let response = "";
+    try {
+      // Llamar al servicio de Move Agent
+      const response = await moveAgentService.processMessage(userMessage.content, walletAddress);
       
-      if (inputValue.toLowerCase().includes("usdt") || inputValue.toLowerCase().includes("send")) {
-        response = `Hello, of course yes. 100 USDT will be sent to ${inputValue.match(/[\w.-]+@[\w.-]+\.\w+/)?.[0] || "the recipient"}`;
-        
-        // Add second message after a delay
-        setTimeout(() => {
-          const followUpMessage: Message = {
-            id: (Date.now() + 1000).toString(),
-            content: `The 100 USDT have already been sent to ${inputValue.match(/[\w.-]+@[\w.-]+\.\w+/)?.[0] || "the recipient"}\nWould you like something more?`,
-            sender: 'bot',
-            timestamp: new Date()
-          };
-          setMessages(prev => [...prev, followUpMessage]);
-        }, 2000);
-      } else {
-        response = "How can I help you with your wallet today?";
-      }
-      
+      // Agregar respuesta del bot
       const botMessage: Message = {
         id: (Date.now() + 100).toString(),
-        content: response,
+        content: response.success && response.data?.response.content 
+          ? response.data.response.content 
+          : response.message || "No pude procesar tu solicitud.",
         sender: 'bot',
         timestamp: new Date()
       };
       
       setMessages(prev => [...prev, botMessage]);
-    }, 1000);
-  };
-
-  const handleSuggestionClick = (suggestion: string) => {
-    setInputValue(suggestion);
-    
-    // Auto-send the suggestion
-    setTimeout(() => {
-      const userMessage: Message = {
-        id: Date.now().toString(),
-        content: suggestion,
-        sender: 'user',
+    } catch (error) {
+      console.error('Error en el flujo de chat:', error);
+      
+      // Agregar mensaje de error
+      const errorMessage: Message = {
+        id: (Date.now() + 100).toString(),
+        content: "Lo siento, encontré un error al procesar tu solicitud.",
+        sender: 'bot',
         timestamp: new Date()
       };
       
-      setMessages([userMessage]);
-      setChatStarted(true);
-      
-      // Simulate bot response
-      setTimeout(() => {
-        const botMessage: Message = {
-          id: (Date.now() + 100).toString(),
-          content: `Hello, of course yes. 100 USDT will be sent to elias.soria.juan.manuel@gmail.com`,
-          sender: 'bot',
-          timestamp: new Date()
-        };
-        
-        setMessages(prev => [...prev, botMessage]);
-        
-        // Add second message after a delay
-        setTimeout(() => {
-          const followUpMessage: Message = {
-            id: (Date.now() + 1000).toString(),
-            content: `The 100 USDT have already been sent to elias.soria.juan.manuel@gmail.com\nWould you like something more?`,
-            sender: 'bot',
-            timestamp: new Date()
-          };
-          setMessages(prev => [...prev, followUpMessage]);
-        }, 2000);
-      }, 1000);
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSuggestionClick = async (suggestion: string) => {
+    setInputValue(suggestion);
+    
+    setTimeout(() => {
+      // Enviar el mensaje automáticamente
+      handleSendMessage();
     }, 100);
   };
 
@@ -181,8 +182,18 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onClose }) => {
             <path d="M19 12H5M12 19l-7-7 7-7"></path>
           </svg>
         </button>
-        <h2 className="text-lg font-semibold mx-auto">Wallet Chat</h2>
-        <div className="w-8"></div>
+        <h2 className="text-lg font-semibold mx-auto">Move AI Wallet</h2>
+        <div className="w-8">
+          {serviceStatus === 'checking' && (
+            <div className="h-3 w-3 rounded-full bg-yellow-500 mx-auto animate-pulse" title="Verificando estado del servicio" />
+          )}
+          {serviceStatus === 'online' && (
+            <div className="h-3 w-3 rounded-full bg-green-500 mx-auto" title="Servicio en línea" />
+          )}
+          {serviceStatus === 'offline' && (
+            <div className="h-3 w-3 rounded-full bg-red-500 mx-auto" title="Servicio fuera de línea" />
+          )}
+        </div>
       </div>
 
       {/* Content with scroll */}
@@ -200,25 +211,25 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onClose }) => {
 
             {/* Suggestions */}
             <p className="text-gray-400 text-center mb-6">
-              These are just a few examples of what I can do.
+              Here are some examples of what I can do with Move AI technology:
             </p>
             
             <ChatSuggestion 
-              title="Send a currency to a friend" 
-              description="Send 200 APT to Jeremy" 
-              onClick={() => handleSuggestionClick("Hello, assistant. You can send 100 USDT to the following person elias.soria.juan.manuel@gmail.com Thank you!")}
+              title="Send Money" 
+              description="Send 100 USDT to a friend" 
+              onClick={() => handleSuggestionClick("Please send 100 USDT to example@email.com")}
             />
             
             <ChatSuggestion 
-              title="Ask for money" 
-              description="Request Jeremy to pay me 100 APT" 
-              onClick={() => handleSuggestionClick("I need Jeremy to send me 100 APT")}
+              title="Check Balance" 
+              description="View your current token balances" 
+              onClick={() => handleSuggestionClick("What is my current balance?")}
             />
             
             <ChatSuggestion 
-              title="Sent a currency to an address" 
-              description="Send 100 APT to an address" 
-              onClick={() => handleSuggestionClick("Please send 100 USDT to elias.soria.juan.manuel@gmail.com")}
+              title="Transfer to Address" 
+              description="Send APT to a specific address" 
+              onClick={() => handleSuggestionClick("Transfer 5 APT to 0x123456789abcdef")}
             />
           </div>
         ) : (
@@ -230,6 +241,11 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onClose }) => {
                 <BotMessage key={message.id} content={message.content} />
               )
             ))}
+            {isLoading && (
+              <div className="flex justify-center p-4">
+                <div className="h-6 w-6 rounded-full border-2 border-t-transparent border-gray-300 animate-spin" />
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -252,13 +268,16 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onClose }) => {
                 handleSendMessage();
               }
             }}
+            disabled={isLoading || serviceStatus === 'offline'}
           />
           <Button
             variant="ghost"
             size="icon"
-            className="text-gray-400 p-2 rounded-full hover:bg-gray-200"
+            className={`text-gray-400 p-2 rounded-full hover:bg-gray-200 ${
+              (isLoading || !inputValue.trim() || serviceStatus === 'offline') ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
             onClick={handleSendMessage}
-            disabled={!inputValue.trim()}
+            disabled={isLoading || !inputValue.trim() || serviceStatus === 'offline'}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -277,6 +296,11 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onClose }) => {
             </svg>
           </Button>
         </div>
+        {serviceStatus === 'offline' && (
+          <p className="text-red-500 text-xs mt-2 text-center">
+            El servicio de Move Agent no está disponible. Algunas funcionalidades pueden estar limitadas.
+          </p>
+        )}
       </div>
     </div>
   );
