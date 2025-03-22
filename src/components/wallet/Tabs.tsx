@@ -7,7 +7,7 @@ const Tabs: React.FC<TabsProps> = ({
   activeTab,
   onTabChange
 }) => {
-  return <div className="bg-[rgba(243,245,246,1)] self-strech flex items-center gap-[17px] text-sm font-semibold whitespace-nowrap text-center justify-center p-1 rounded-2xl">
+  return <div className="bg-[rgba(243,245,246,1)] flex items-center gap-[17px] text-sm font-semibold whitespace-nowrap text-center justify-center p-1 rounded-lg">
       <button className={`self-stretch min-h-12 gap-2.5 w-[175px] my-auto px-2.5 py-4 rounded-2xl ${activeTab === "tokens" ? "bg-[rgba(39,39,41,1)] text-[rgba(227,223,223,1)]" : "text-[rgba(39,39,41,1)]"}`} onClick={() => onTabChange("tokens")}>
         Tokens
       </button>
