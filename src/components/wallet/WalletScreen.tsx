@@ -38,17 +38,17 @@ const WalletScreen: React.FC = () => {
 
   if (showChatScreen) {
     return (
-      <div className="bg-white h-screen max-w-[480px] w-full overflow-hidden mx-auto">
+      <div className="bg-white h-full max-w-[480px] w-full overflow-hidden mx-auto">
         <ChatScreen onClose={() => setShowChatScreen(false)} />
       </div>
     );
   }
 
   return (
-    <div className="bg-[rgba(243,245,246,1)] flex max-w-[480px] w-full flex-col overflow-hidden mx-auto h-screen pt-[53px] relative">
+    <div className="bg-[rgba(243,245,246,1)] flex max-w-[480px] w-full flex-col overflow-hidden items-stretch mx-auto pt-[53px]">
       <Header username="Username" balance="$2,663.56" />
 
-      <div className="bg-white border flex w-full flex-col items-center pt-5 pb-36 px-[27px] rounded-[20px] border-[rgba(237,237,237,1)] border-solid flex-1 overflow-y-auto">
+      <div className="bg-white border flex min-h-[625px] w-full flex-col items-center pt-5 pb-[132px] px-[27px] rounded-[20px] border-[rgba(237,237,237,1)] border-solid">
         <Tabs activeTab={activeTab} onTabChange={setActiveTab} />
 
         {activeTab === "tokens" ? <>
