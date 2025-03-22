@@ -163,104 +163,119 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-100 flex items-center justify-center overflow-hidden">
-      <div className="relative w-full max-w-md h-[85vh] bg-white flex flex-col overflow-hidden rounded-xl shadow-lg">
-        {/* Header */}
-        <div className="p-4 flex items-center border-b border-gray-200">
-          <button onClick={onClose} className="text-gray-500">
+    <div className="h-full flex flex-col overflow-hidden">
+      {/* Header */}
+      <div className="p-4 flex items-center border-b border-gray-200">
+        <button onClick={onClose} className="text-gray-500 hover:bg-gray-100 p-2 rounded-full transition-colors">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M19 12H5M12 19l-7-7 7-7"></path>
+          </svg>
+        </button>
+        <h2 className="text-lg font-semibold mx-auto">Wallet Chat</h2>
+        <div className="w-8"></div>
+      </div>
+
+      {/* Content with scroll */}
+      <div className="flex-1 overflow-y-auto">
+        {!chatStarted ? (
+          <div className="p-5 flex flex-col">
+            {/* Bot avatar for welcome screen */}
+            <div className="flex justify-center mt-4 mb-10">
+              <img 
+                src="/lovable-uploads/3992c85c-5a2a-4d3f-8961-b8b8f7f07838.png" 
+                alt="Wallet Bot" 
+                className="w-24 h-24"
+              />
+            </div>
+
+            {/* Suggestions */}
+            <p className="text-gray-400 text-center mb-6">
+              These are just a few examples of what I can do.
+            </p>
+            
+            <ChatSuggestion 
+              title="Send a currency to a friend" 
+              description="Send 200 APT to Jeremy" 
+              onClick={() => handleSuggestionClick("Hello, assistant. You can send 100 USDT to the following person elias.soria.juan.manuel@gmail.com Thank you!")}
+            />
+            
+            <ChatSuggestion 
+              title="Ask for money" 
+              description="Request Jeremy to pay me 100 APT" 
+              onClick={() => handleSuggestionClick("I need Jeremy to send me 100 APT")}
+            />
+            
+            <ChatSuggestion 
+              title="Sent a currency to an address" 
+              description="Send 100 APT to an address" 
+              onClick={() => handleSuggestionClick("Please send 100 USDT to elias.soria.juan.manuel@gmail.com")}
+            />
+          </div>
+        ) : (
+          <div className="flex flex-col">
+            {messages.map((message) => (
+              message.sender === 'user' ? (
+                <UserMessage key={message.id} content={message.content} />
+              ) : (
+                <BotMessage key={message.id} content={message.content} />
+              )
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Chat input */}
+      <div className="p-4 border-t border-gray-200 bg-white">
+        <div className="flex items-center gap-4 bg-gray-100 p-3 px-5 rounded-full">
+          <img 
+            src="/lovable-uploads/3992c85c-5a2a-4d3f-8961-b8b8f7f07838.png" 
+            alt="Bot" 
+            className="w-6 h-6"
+          />
+          <Input 
+            placeholder="How can help you?" 
+            className="border-none bg-transparent shadow-none focus-visible:ring-0 flex-1 p-0 h-auto text-base"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSendMessage();
+              }
+            }}
+          />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-gray-400 p-2 rounded-full hover:bg-gray-200"
+            onClick={handleSendMessage}
+            disabled={!inputValue.trim()}
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
+              width="20"
+              height="20"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
+              className={`${!inputValue.trim() ? "text-gray-300" : "text-blue-500"}`}
             >
-              <path d="M19 12H5M12 19l-7-7 7-7"></path>
+              <path d="m22 2-7 20-4-9-9-4Z" />
+              <path d="M22 2 11 13" />
             </svg>
-          </button>
-          <h2 className="text-lg font-semibold mx-auto">Wallet Chat</h2>
-          <div className="w-8"></div>
-        </div>
-
-        {/* Content with scroll */}
-        <div className="flex-1 overflow-y-auto">
-          {!chatStarted ? (
-            <div className="p-5 flex flex-col">
-              {/* Bot avatar for welcome screen */}
-              <div className="flex justify-center mt-4 mb-10">
-                <img 
-                  src="/lovable-uploads/3992c85c-5a2a-4d3f-8961-b8b8f7f07838.png" 
-                  alt="Wallet Bot" 
-                  className="w-24 h-24"
-                />
-              </div>
-
-              {/* Suggestions */}
-              <p className="text-gray-400 text-center mb-6">
-                These are just a few examples of what I can do.
-              </p>
-              
-              <ChatSuggestion 
-                title="Send a currency to a friend" 
-                description="Send 200 APT to Jeremy" 
-                onClick={() => handleSuggestionClick("Hello, assistant. You can send 100 USDT to the following person elias.soria.juan.manuel@gmail.com Thank you!")}
-              />
-              
-              <ChatSuggestion 
-                title="Ask for money" 
-                description="Request Jeremy to pay me 100 APT" 
-                onClick={() => handleSuggestionClick("I need Jeremy to send me 100 APT")}
-              />
-              
-              <ChatSuggestion 
-                title="Sent a currency to an address" 
-                description="Send 100 APT to an address" 
-                onClick={() => handleSuggestionClick("Please send 100 USDT to elias.soria.juan.manuel@gmail.com")}
-              />
-            </div>
-          ) : (
-            <div className="flex flex-col">
-              {messages.map((message) => (
-                message.sender === 'user' ? (
-                  <UserMessage key={message.id} content={message.content} />
-                ) : (
-                  <BotMessage key={message.id} content={message.content} />
-                )
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Chat input */}
-        <div className="p-4 border-t border-gray-200 bg-white">
-          <div className="flex items-center gap-4 bg-gray-100 p-3 px-5 rounded-full">
-            <img 
-              src="/lovable-uploads/3992c85c-5a2a-4d3f-8961-b8b8f7f07838.png" 
-              alt="Bot" 
-              className="w-6 h-6"
-            />
-            <Input 
-              placeholder="How can help you?" 
-              className="border-none bg-transparent shadow-none focus-visible:ring-0 flex-1 p-0 h-auto text-base"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-            />
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="rounded-full bg-white h-10 w-10 shadow-sm"
-              onClick={handleSendMessage}
-            >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M20 12L4 4L6 12M20 12L4 20L6 12M20 12H6" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </Button>
-          </div>
+          </Button>
         </div>
       </div>
     </div>

@@ -10,13 +10,15 @@ import ReceiveScreen from "./ReceiveScreen";
 import DepositScreen from "./DepositScreen";
 import SwapScreen from "./SwapScreen";
 import SettingsScreen from "./SettingsScreen";
+import AnimatedView from "@/components/ui/AnimatedView";
 import { useWeb3Auth } from "@/context/Web3AuthContext";
 import { requestAirdrop } from "@/utils/aptos";
 
 const WalletScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState("tokens");
-  const [showChatScreen, setShowChatScreen] = useState(false);
   const [currentView, setCurrentView] = useState<"main" | "send" | "receive" | "deposit" | "swap" | "settings" | "chat">("main");
+  const [exitingView, setExitingView] = useState("");
+  const [mainViewVisible, setMainViewVisible] = useState(true);
   const { aptosBalance, aptosAddress, userInfo, getBalance, aptosAccount, logout } = useWeb3Auth();
 
   // Format the balance to a human-readable format
@@ -46,6 +48,11 @@ const WalletScreen: React.FC = () => {
     return () => clearInterval(intervalId);
   }, [getBalance]);
 
+  // Efecto para mostrar la animación de la vista principal cuando se monta
+  useEffect(() => {
+    setMainViewVisible(true);
+  }, []);
+
   // Tokens data with real APT balance
   const tokens = [{
     id: "1",
@@ -61,11 +68,44 @@ const WalletScreen: React.FC = () => {
 
   const totalUsdBalance = getUsdValue(aptosBalance);
 
+  // Gestión mejorada de transiciones entre vistas
+  const handleShowView = (view: "main" | "send" | "receive" | "deposit" | "swap" | "settings" | "chat") => {
+    if (view === "main") {
+      // Ocultamos la vista actual (que no es main)
+      setExitingView(currentView);
+      setMainViewVisible(false);
+      
+      // Después de un breve retraso, actualizamos la vista y mostramos main
+      setTimeout(() => {
+        setExitingView("");
+        setCurrentView("main");
+        setMainViewVisible(true);
+      }, 400);
+    } else if (currentView !== "main") {
+      // Si ya hay una vista diferente a main, primero la ocultamos con animación
+      setExitingView(currentView);
+      setCurrentView("main");
+      setMainViewVisible(true);
+      
+      // Después de un breve retraso para la transición, mostramos la nueva vista
+      setTimeout(() => {
+        setExitingView("");
+        setMainViewVisible(false);
+        setCurrentView(view);
+      }, 500);
+    } else {
+      // Si estamos en la vista principal, animamos la salida y mostramos la nueva vista
+      setMainViewVisible(false);
+      setTimeout(() => {
+        setCurrentView(view);
+      }, 300);
+    }
+  };
+
   // Handle sending message in chat
   const handleSendMessage = (message: string) => {
     console.log("Sending message:", message);
-    setCurrentView("chat");
-    // Implement message sending logic here
+    handleShowView("chat");
   };
 
   // Handle wallet action buttons
@@ -74,22 +114,22 @@ const WalletScreen: React.FC = () => {
     
     switch (action) {
       case "Send":
-        setCurrentView("send");
+        handleShowView("send");
         break;
       case "Receive":
-        setCurrentView("receive");
+        handleShowView("receive");
         break;
       case "Deposit":
-        setCurrentView("deposit");
+        handleShowView("deposit");
         break;
       case "Swap":
-        setCurrentView("swap");
+        handleShowView("swap");
         break;
       case "Settings":
-        setCurrentView("settings");
+        handleShowView("settings");
         break;
       case "Chat":
-        setCurrentView("chat");
+        handleShowView("chat");
         break;
     }
   };
@@ -99,64 +139,75 @@ const WalletScreen: React.FC = () => {
     await logout();
   };
 
-  // Render the appropriate view based on currentView state
-  const renderView = () => {
-    switch (currentView) {
-      case "send":
-        return <SendScreen onClose={() => setCurrentView("main")} />;
-      case "receive":
-        return <ReceiveScreen onClose={() => setCurrentView("main")} />;
-      case "deposit":
-        return <DepositScreen onClose={() => setCurrentView("main")} />;
-      case "swap":
-        return <SwapScreen onClose={() => setCurrentView("main")} />;
-      case "settings":
-        return <SettingsScreen onClose={() => setCurrentView("main")} onLogout={handleLogout} />;
-      case "chat":
-        return <ChatScreen onClose={() => setCurrentView("main")} />;
-      default:
-        return (
-          <>
-            <Header 
-              username={userInfo?.name || "User"} 
-              balance={`$${totalUsdBalance}`}
-              onSettingsClick={() => handleActionButton("Settings")}
-            />
-
-            <div className="bg-white border flex min-h-[625px] w-full flex-col items-center pt-5 pb-[132px] px-[27px] rounded-[20px] border-[rgba(237,237,237,1)] border-solid">
-              <Tabs activeTab={activeTab} onTabChange={setActiveTab} />
-
-              {activeTab === "tokens" ? (
-                <>
-                  <TokensList tokens={tokens} />
-                  <ActionButtons 
-                    onSend={() => handleActionButton("Send")} 
-                    onReceive={() => handleActionButton("Receive")} 
-                    onDeposit={() => handleActionButton("Deposit")} 
-                    onSwap={() => handleActionButton("Swap")} 
-                  />
-                </>
-              ) : (
-                <div className="relative self-stretch flex items-center justify-center h-full w-full py-0">
-                  <p className="text-gray-500">
-                    Transaction history will appear here
-                  </p>
-                </div>
-              )}
-            </div>
-
-            <ChatInput 
-              onSendMessage={handleSendMessage} 
-              onInputClick={() => handleActionButton("Chat")}
-            />
-          </>
-        );
-    }
+  // Verificación de si una vista está activa o saliendo (para animaciones)
+  const isViewActive = (view: string) => {
+    return currentView === view || exitingView === view;
   };
 
   return (
-    <div className="bg-[rgba(243,245,246,1)] flex max-w-[480px] w-full flex-col overflow-hidden items-stretch mx-auto pt-[53px] h-full">
-      {renderView()}
+    <div className="bg-[rgba(243,245,246,1)] flex max-w-[480px] w-full flex-col overflow-hidden items-center mx-auto pt-[53px] h-full">
+      {/* Vista principal con animación */}
+      {currentView === "main" && (
+        <div className={`flex flex-col items-center w-full transition-all duration-500 transform ${mainViewVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <Header 
+            username={userInfo?.name || "User"} 
+            balance={`$${totalUsdBalance}`}
+            onSettingsClick={() => handleActionButton("Settings")}
+          />
+
+          <div className="bg-white border flex min-h-[625px] w-full flex-col items-center pt-5 pb-[132px] px-[27px] rounded-[20px] border-[rgba(237,237,237,1)] border-solid">
+            <Tabs activeTab={activeTab} onTabChange={setActiveTab} />
+
+            {activeTab === "tokens" ? (
+              <>
+                <TokensList tokens={tokens} />
+                <ActionButtons 
+                  onSend={() => handleActionButton("Send")} 
+                  onReceive={() => handleActionButton("Receive")} 
+                  onDeposit={() => handleActionButton("Deposit")} 
+                  onSwap={() => handleActionButton("Swap")} 
+                />
+              </>
+            ) : (
+              <div className="relative self-stretch flex items-center justify-center h-full w-full py-0">
+                <p className="text-gray-500">
+                  Transaction history will appear here
+                </p>
+              </div>
+            )}
+          </div>
+
+          <ChatInput 
+            onSendMessage={handleSendMessage} 
+            onInputClick={() => handleActionButton("Chat")}
+          />
+        </div>
+      )}
+
+      {/* Vistas animadas */}
+      <AnimatedView show={isViewActive("send")} direction="right">
+        <SendScreen onClose={() => handleShowView("main")} />
+      </AnimatedView>
+      
+      <AnimatedView show={isViewActive("receive")} direction="right">
+        <ReceiveScreen onClose={() => handleShowView("main")} />
+      </AnimatedView>
+      
+      <AnimatedView show={isViewActive("deposit")} direction="right">
+        <DepositScreen onClose={() => handleShowView("main")} />
+      </AnimatedView>
+      
+      <AnimatedView show={isViewActive("swap")} direction="right">
+        <SwapScreen onClose={() => handleShowView("main")} />
+      </AnimatedView>
+      
+      <AnimatedView show={isViewActive("settings")} direction="right">
+        <SettingsScreen onClose={() => handleShowView("main")} onLogout={handleLogout} />
+      </AnimatedView>
+      
+      <AnimatedView show={isViewActive("chat")} direction="right">
+        <ChatScreen onClose={() => handleShowView("main")} />
+      </AnimatedView>
     </div>
   );
 };

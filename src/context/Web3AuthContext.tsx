@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import { Web3Auth } from '@web3auth/modal';
 import { clientId, privateKeyProvider, web3AuthNetwork } from '../config/web3auth';
 import { getAptosAccount, getAptosBalance } from '../utils/aptos';
+import { saveUserData } from '../utils/supabase';
 import { Account } from '@aptos-labs/ts-sdk';
 import { CHAIN_NAMESPACES } from '@web3auth/base';
 
@@ -26,6 +27,7 @@ interface Web3AuthContextType {
   login: () => Promise<void>;
   logout: () => Promise<void>;
   getBalance: () => Promise<void>;
+  getPrivateKey: () => Promise<string | null>;
 }
 
 const Web3AuthContext = createContext<Web3AuthContextType>({} as Web3AuthContextType);
@@ -97,13 +99,24 @@ export const Web3AuthProvider = ({ children }: Web3AuthProviderProps) => {
       // Obtener información del usuario
       try {
         const user = await web3authInstance.getUserInfo();
+        const userEmail = user.email || '';
+        
         setUserInfo({
           name: user.name || 'Anonymous User',
-          email: user.email || '',
+          email: userEmail,
           profileImage: user.profileImage || '',
           verifier: user.verifier || '',
           verifierId: user.verifierId || '',
         });
+        
+        // Guardar datos del usuario en Supabase si tenemos email y dirección
+        if (userEmail && aptosAccountAddress) {
+          try {
+            await saveUserData(userEmail, aptosAccountAddress);
+          } catch (error) {
+            console.error('Error saving user data to Supabase:', error);
+          }
+        }
       } catch (error) {
         console.error('Error getting user info, using default values:', error);
         setUserInfo({
@@ -172,6 +185,24 @@ export const Web3AuthProvider = ({ children }: Web3AuthProviderProps) => {
     }
   };
 
+  const getPrivateKey = async (): Promise<string | null> => {
+    if (!web3auth || !web3auth.provider) {
+      console.error('Web3Auth not initialized or not connected');
+      return null;
+    }
+
+    try {
+      const privateKey = await web3auth.provider.request({
+        method: 'private_key',
+      }) as string;
+      
+      return privateKey;
+    } catch (error) {
+      console.error('Error getting private key:', error);
+      return null;
+    }
+  };
+
   return (
     <Web3AuthContext.Provider
       value={{
@@ -186,6 +217,7 @@ export const Web3AuthProvider = ({ children }: Web3AuthProviderProps) => {
         login,
         logout,
         getBalance,
+        getPrivateKey,
       }}
     >
       {children}
