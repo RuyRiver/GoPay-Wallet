@@ -23,9 +23,9 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, onInputClick }) =>
         onClick={onInputClick}
       >
         <img
-          src="https://cdn.builder.io/api/v1/image/assets/20e65f047558427aa511c5569cf902c1/0613f277d19c4270b71feef4736a6337e466599a?placeholderIfAbsent=true"
+          src="/lovable-uploads/3992c85c-5a2a-4d3f-8961-b8b8f7f07838.png"
           className="aspect-[1] object-contain w-4 self-stretch shrink-0 my-auto"
-          alt="Search"
+          alt="Bot"
         />
         <input
           type="text"
