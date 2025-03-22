@@ -16,7 +16,7 @@ import { requestAirdrop } from "@/utils/aptos";
 const WalletScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState("tokens");
   const [showChatScreen, setShowChatScreen] = useState(false);
-  const [currentView, setCurrentView] = useState<"main" | "send" | "receive" | "deposit" | "swap" | "settings">("main");
+  const [currentView, setCurrentView] = useState<"main" | "send" | "receive" | "deposit" | "swap" | "settings" | "chat">("main");
   const { aptosBalance, aptosAddress, userInfo, getBalance, aptosAccount, logout } = useWeb3Auth();
 
   // Format the balance to a human-readable format
@@ -64,6 +64,7 @@ const WalletScreen: React.FC = () => {
   // Handle sending message in chat
   const handleSendMessage = (message: string) => {
     console.log("Sending message:", message);
+    setCurrentView("chat");
     // Implement message sending logic here
   };
 
@@ -87,6 +88,9 @@ const WalletScreen: React.FC = () => {
       case "Settings":
         setCurrentView("settings");
         break;
+      case "Chat":
+        setCurrentView("chat");
+        break;
     }
   };
 
@@ -97,10 +101,6 @@ const WalletScreen: React.FC = () => {
 
   // Render the appropriate view based on currentView state
   const renderView = () => {
-    if (showChatScreen) {
-      return <ChatScreen onClose={() => setShowChatScreen(false)} />;
-    }
-
     switch (currentView) {
       case "send":
         return <SendScreen onClose={() => setCurrentView("main")} />;
@@ -112,6 +112,8 @@ const WalletScreen: React.FC = () => {
         return <SwapScreen onClose={() => setCurrentView("main")} />;
       case "settings":
         return <SettingsScreen onClose={() => setCurrentView("main")} onLogout={handleLogout} />;
+      case "chat":
+        return <ChatScreen onClose={() => setCurrentView("main")} />;
       default:
         return (
           <>
@@ -143,7 +145,10 @@ const WalletScreen: React.FC = () => {
               )}
             </div>
 
-            <ChatInput onSendMessage={handleSendMessage} onInputClick={() => setShowChatScreen(true)} />
+            <ChatInput 
+              onSendMessage={handleSendMessage} 
+              onInputClick={() => handleActionButton("Chat")}
+            />
           </>
         );
     }
