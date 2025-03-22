@@ -1,13 +1,18 @@
 import { CHAIN_NAMESPACES, WEB3AUTH_NETWORK } from "@web3auth/base";
 import { CommonPrivateKeyProvider } from "@web3auth/base-provider";
 
+// Get environment variables
+const APTOS_NODE_URL = import.meta.env.VITE_APTOS_NODE_URL || 'https://fullnode.testnet.aptoslabs.com/v1';
+const APTOS_CHAIN_ID = import.meta.env.VITE_APTOS_CHAIN_ID || '0x2';
+const APTOS_EXPLORER_URL = import.meta.env.VITE_APTOS_EXPLORER_URL || 'https://explorer.aptoslabs.com/?network=testnet';
+
 // Aptos Testnet chain configuration
 export const chainConfig = {
   chainNamespace: CHAIN_NAMESPACES.OTHER,
-  chainId: "0x2", // Testnet chain ID
-  rpcTarget: "https://fullnode.testnet.aptoslabs.com/v1",
+  chainId: APTOS_CHAIN_ID, // Testnet chain ID
+  rpcTarget: APTOS_NODE_URL,
   displayName: "Aptos Testnet",
-  blockExplorerUrl: "https://explorer.aptoslabs.com/?network=testnet",
+  blockExplorerUrl: APTOS_EXPLORER_URL,
   ticker: "APT",
   tickerName: "Aptos",
 };
@@ -17,11 +22,13 @@ export const privateKeyProvider = new CommonPrivateKeyProvider({
   config: { chainConfig },
 });
 
-// Web3Auth client ID - Replace with your actual client ID from Web3Auth Dashboard
-export const clientId = "BJftGzkpcR_Dg_tV9A0uvAWKMHcs-j2QzfD_v-ZYP1hA0DIqRg3v1npLxKnxFkhuFtpIZ06HRORWSo21bVlpcwg"; // Test client ID - replace with your own from https://dashboard.web3auth.io
+// Web3Auth client ID from environment variables
+export const clientId = import.meta.env.VITE_WEB3AUTH_CLIENT_ID || "";
 
 // Web3Auth network configuration
-export const web3AuthNetwork = WEB3AUTH_NETWORK.SAPPHIRE_DEVNET; // Use DEVNET for testing
+export const web3AuthNetwork = import.meta.env.VITE_WEB3AUTH_NETWORK === 'SAPPHIRE_MAINNET' 
+  ? WEB3AUTH_NETWORK.SAPPHIRE_MAINNET 
+  : WEB3AUTH_NETWORK.SAPPHIRE_DEVNET;
 
 // Default verifier name to use with single-factor-auth
-export const verifierName = "web3auth-aptos-verifier"; // Replace with your actual verifier name
+export const verifierName = import.meta.env.VITE_VERIFIER_NAME || "web3auth-aptos-verifier";

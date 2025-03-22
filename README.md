@@ -4,6 +4,31 @@
 
 **URL**: https://lovable.dev/projects/344cdc19-71b3-40df-92f5-3ebdf96dc220
 
+## Environment Setup
+
+This project uses environment variables for configuration. Follow these steps to set up your environment:
+
+1. Create a `.env` file in the root directory of the project.
+2. Use the `.env.example` file as a reference for the required variables.
+3. Fill in your specific values for each variable:
+   - **Supabase**: Set your Supabase URL and anonymous key
+   - **Web3Auth**: Add your client ID and select the network (SAPPHIRE_DEVNET or SAPPHIRE_MAINNET)
+   - **Aptos**: The default values for testnet should work, but you can customize if needed
+   - **Verifier**: Set the verifier name for Web3Auth
+
+Example:
+```
+# Supabase configuration
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# Web3Auth configuration
+VITE_WEB3AUTH_CLIENT_ID=your_web3auth_client_id
+VITE_WEB3AUTH_NETWORK=SAPPHIRE_DEVNET
+```
+
+> **Note:** Since this project uses Vite, environment variables need to be prefixed with `VITE_` to be accessible in the browser.
+
 ## How can I edit this code?
 
 There are several ways of editing your application.

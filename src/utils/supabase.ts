@@ -1,9 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Supabase configuration
-const supabaseUrl = 'https://cwilqsuufdfonfllsbhr.supabase.co';
-// Using anon key as it's safe for browser clients with RLS enabled
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN3aWxxc3V1ZmRmb25mbGxzYmhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDIxNTkzMTQsImV4cCI6MjA1NzczNTMxNH0.ZaZpBdBfOKcyurfDNgmI6yqotBNjdwLGqmtGymGYeMk';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+// Using anon key from environment variables
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 // Initialize Supabase client
 export const supabase = createClient(supabaseUrl, supabaseKey);
