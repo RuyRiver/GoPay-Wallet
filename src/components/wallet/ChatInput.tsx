@@ -1,10 +1,12 @@
+
 import React, { useState } from "react";
 
 interface ChatInputProps {
   onSendMessage?: (message: string) => void;
+  onInputClick?: () => void;
 }
 
-const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
+const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, onInputClick }) => {
   const [message, setMessage] = useState("");
 
   const handleSend = () => {
@@ -16,7 +18,10 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
 
   return (
     <div className="z-10 flex mt-[-109px] w-full items-center gap-6 pt-5 pb-[41px] px-7 border-[rgba(244,244,244,1)] border-t">
-      <div className="bg-[rgba(232,232,232,1)] shadow-[20px_20px_60px_rgba(197,197,197,1)] self-stretch flex min-w-60 items-center gap-2.5 text-[13px] text-[rgba(117,117,117,1)] font-normal flex-1 shrink basis-[0%] my-auto px-4 py-[15px] rounded-2xl">
+      <div 
+        className="bg-[rgba(232,232,232,1)] shadow-[20px_20px_60px_rgba(197,197,197,1)] self-stretch flex min-w-60 items-center gap-2.5 text-[13px] text-[rgba(117,117,117,1)] font-normal flex-1 shrink basis-[0%] my-auto px-4 py-[15px] rounded-2xl cursor-pointer"
+        onClick={onInputClick}
+      >
         <img
           src="https://cdn.builder.io/api/v1/image/assets/20e65f047558427aa511c5569cf902c1/0613f277d19c4270b71feef4736a6337e466599a?placeholderIfAbsent=true"
           className="aspect-[1] object-contain w-4 self-stretch shrink-0 my-auto"
@@ -24,11 +29,16 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
         />
         <input
           type="text"
-          className="bg-transparent outline-none w-full"
+          className="bg-transparent outline-none w-full cursor-pointer"
           placeholder="How can help you?"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSend()}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (onInputClick) onInputClick();
+          }}
+          readOnly
         />
       </div>
       <button
