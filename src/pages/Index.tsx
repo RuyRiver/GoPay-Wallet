@@ -1,11 +1,11 @@
-import React from "react";
-import WalletScreen from "@/components/wallet/WalletScreen";
 
-const Index: React.FC = () => {
+import { StartScreen } from "@/components/start-screen/StartScreen";
+
+const Index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-      <WalletScreen />
-    </div>
+    <main className="min-h-screen h-screen flex items-center justify-center bg-gray-100">
+      <StartScreen />
+    </main>
   );
 };
 
