@@ -17,9 +17,11 @@ export const privateKeyProvider = new CommonPrivateKeyProvider({
   config: { chainConfig },
 });
 
-
 // Web3Auth client ID - Replace with your actual client ID from Web3Auth Dashboard
 export const clientId = "BJftGzkpcR_Dg_tV9A0uvAWKMHcs-j2QzfD_v-ZYP1hA0DIqRg3v1npLxKnxFkhuFtpIZ06HRORWSo21bVlpcwg"; // Test client ID - replace with your own from https://dashboard.web3auth.io
 
 // Web3Auth network configuration
 export const web3AuthNetwork = WEB3AUTH_NETWORK.SAPPHIRE_DEVNET; // Use DEVNET for testing
+
+// Default verifier name to use with single-factor-auth
+export const verifierName = "web3auth-aptos-verifier"; // Replace with your actual verifier name

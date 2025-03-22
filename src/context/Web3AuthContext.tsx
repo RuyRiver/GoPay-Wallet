@@ -3,6 +3,7 @@ import { Web3Auth } from '@web3auth/modal';
 import { clientId, privateKeyProvider, web3AuthNetwork } from '../config/web3auth';
 import { getAptosAccount, getAptosBalance } from '../utils/aptos';
 import { Account } from '@aptos-labs/ts-sdk';
+import { CHAIN_NAMESPACES } from '@web3auth/base';
 
 // Definir interfaz para la información del usuario
 interface UserInfo {
@@ -49,9 +50,18 @@ export const Web3AuthProvider = ({ children }: Web3AuthProviderProps) => {
     const init = async () => {
       try {
         const web3authInstance = new Web3Auth({
-          clientId,
+          clientId, 
           web3AuthNetwork,
           privateKeyProvider,
+          chainConfig: {
+            chainNamespace: CHAIN_NAMESPACES.OTHER,
+            chainId: "0x2", // Testnet
+            rpcTarget: "https://fullnode.testnet.aptoslabs.com/v1", 
+            displayName: "Aptos Testnet",
+            blockExplorerUrl: "https://explorer.aptoslabs.com/?network=testnet",
+            ticker: "APT",
+            tickerName: "Aptos",
+          },
         });
 
         setWeb3auth(web3authInstance);
@@ -85,14 +95,25 @@ export const Web3AuthProvider = ({ children }: Web3AuthProviderProps) => {
       setAptosAddress(aptosAccountAddress);
 
       // Obtener información del usuario
-      const user = await web3authInstance.getUserInfo();
-      setUserInfo({
-        name: user.name || 'Anonymous User',
-        email: user.email || '',
-        profileImage: user.profileImage || '',
-        verifier: user.verifier || '',
-        verifierId: user.verifierId || '',
-      });
+      try {
+        const user = await web3authInstance.getUserInfo();
+        setUserInfo({
+          name: user.name || 'Anonymous User',
+          email: user.email || '',
+          profileImage: user.profileImage || '',
+          verifier: user.verifier || '',
+          verifierId: user.verifierId || '',
+        });
+      } catch (error) {
+        console.error('Error getting user info, using default values:', error);
+        setUserInfo({
+          name: 'Anonymous User',
+          email: '',
+          profileImage: '',
+          verifier: '',
+          verifierId: '',
+        });
+      }
 
       // Get balance
       await getBalance();
@@ -132,6 +153,7 @@ export const Web3AuthProvider = ({ children }: Web3AuthProviderProps) => {
       setAptosAccount(null);
       setAptosAddress('');
       setAptosBalance(0);
+      setUserInfo(null);
     } catch (error) {
       console.error('Error logging out:', error);
     } finally {

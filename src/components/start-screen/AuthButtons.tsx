@@ -1,5 +1,7 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
+import { useWeb3Auth } from "@/context/Web3AuthContext";
+import { useNavigate } from "react-router-dom";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary";
@@ -37,11 +39,25 @@ interface AuthButtonsProps {
 }
 
 export function AuthButtons({ className }: AuthButtonsProps) {
+  const { login, isLoading } = useWeb3Auth();
+  const navigate = useNavigate();
+
+  const handleLogin = async () => {
+    try {
+      await login();
+      navigate("/wallet");
+    } catch (error) {
+      console.error("Login failed:", error);
+    }
+  };
+
   return (
     <div className={cn("w-full text-base font-bold text-center", className)}>
-      <Button variant="primary">Sign Up</Button>
-      <Button variant="secondary" className="mt-5">
-        Log In
+      <Button variant="primary" onClick={handleLogin} disabled={isLoading}>
+        {isLoading ? "Connecting..." : "Sign Up"}
+      </Button>
+      <Button variant="secondary" className="mt-5" onClick={handleLogin} disabled={isLoading}>
+        {isLoading ? "Connecting..." : "Log In"}
       </Button>
     </div>
   );
