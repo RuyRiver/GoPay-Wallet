@@ -82,8 +82,8 @@ const BotMessage: React.FC<{ content: string }> = ({ content }) => {
     <div className="flex gap-3 p-4">
       <Avatar className="h-10 w-10 self-start">
         <img 
-          src="/logo/logo@favicon.png" 
-          alt="GoPay Bot" 
+          src="/logo/logo@vector.svg" 
+          alt="Bot" 
           className="h-10 w-10 rounded-full"
         />
       </Avatar>
