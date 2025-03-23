@@ -646,4 +646,57 @@ Responde en el mismo idioma que use el usuario (inglés o español). Detecta aut
       return { content: `Error al procesar tu solicitud: ${error instanceof Error ? error.message : 'Error desconocido'}` };
     }
   },
+  
+  /**
+   * Obtener una respuesta directa del modelo de IA sin procesamiento adicional
+   * @param prompt Prompt a enviar al modelo
+   * @returns Respuesta directa del modelo
+   */
+  async getRawAIResponse(prompt: string): Promise<string> {
+    try {
+      console.log(`Enviando prompt directo al modelo de IA`);
+      
+      // Verificar API key
+      if (!process.env.OPENROUTER_API_KEY) {
+        console.warn('ADVERTENCIA: OPENROUTER_API_KEY no está configurada');
+        return "Error: No se pudo acceder al modelo de IA. OPENROUTER_API_KEY no configurada.";
+      }
+      
+      // Modelo a utilizar
+      const modelName = process.env.MODEL_NAME || 'openrouter/anthropic/claude-3-opus-20240229';
+      
+      // Petición a OpenRouter
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          'HTTP-Referer': 'https://lovable-wallet.com',
+          'X-Title': 'Lovable Wallet IA'
+        },
+        body: JSON.stringify({
+          model: modelName,
+          messages: [
+            { role: 'system', content: 'Eres un asistente especializado en analizar mensajes de usuarios para determinar sus intenciones en el contexto de una wallet digital.' },
+            { role: 'user', content: prompt }
+          ],
+          temperature: 0.0 // Temperatura baja para respuestas precisas y deterministas
+        })
+      });
+      
+      if (!response.ok) {
+        const errorDetails = await response.text();
+        throw new Error(`Error en la petición a OpenRouter: ${response.status} - ${errorDetails}`);
+      }
+      
+      const data = await response.json();
+      const content = data.choices[0]?.message?.content || 'No se pudo obtener una respuesta';
+      
+      console.log(`Respuesta del modelo recibida (primeros 150 caracteres): ${content.substring(0, 150)}...`);
+      return content;
+    } catch (error) {
+      console.error('Error al obtener respuesta directa del modelo:', error);
+      return `Error: ${error instanceof Error ? error.message : 'Error desconocido'}`;
+    }
+  }
 };
