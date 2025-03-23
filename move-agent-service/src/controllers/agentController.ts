@@ -171,101 +171,174 @@ export const agentController = {
           processedMessage.toLowerCase().includes('transacciones') || 
           processedMessage.toLowerCase().includes('transactions') ||
           processedMessage.toLowerCase().includes('historial') ||
-          processedMessage.toLowerCase().includes('history')) && 
-          resolvedAddress) {
+          processedMessage.toLowerCase().includes('history'))) {
         try {
-          // Usar un límite simple de 10 transacciones por defecto
+          console.log('=== DIAGNÓSTICO DE CONSULTA DE TRANSACCIONES ===');
+          console.log(`Usuario solicitó transacciones. Mensaje original: "${originalMessage}"`);
+          console.log(`Dirección para consulta: ${resolvedAddress || 'NO HAY DIRECCIÓN DISPONIBLE'}`);
+          
+          // Número de transacciones a mostrar
           const limit = processedMessage.toLowerCase().includes('10') ? 10 : 5;
+          console.log(`Número de transacciones solicitadas: ${limit}`);
           
-          console.log(`Buscando ${limit} transacciones para la dirección: ${resolvedAddress}`);
-          
-          // Obtener directamente las transacciones de la base de datos
-          const { data, error } = await supabase
-            .from('transactions')
-            .select(`
-              id,
-              from_address,
-              to_address,
-              amount,
-              token,
-              status,
-              created_at
-            `)
-            .or(`from_address.eq.${resolvedAddress},to_address.eq.${resolvedAddress}`)
-            .order('created_at', { ascending: false })
-            .limit(limit);
-          
-          if (error) {
-            console.error('Error al consultar transacciones:', error);
-            extraContext += language === 'es'
-              ? "\nINFORMACIÓN CRÍTICA: No se pudieron obtener tus transacciones debido a un error en la base de datos. DEBES informar esto al usuario.\n"
-              : "\nCRITICAL INFORMATION: Could not retrieve your transactions due to a database error. You MUST inform this to the user.\n";
-          }
-          else if (!data || data.length === 0) {
-            extraContext += language === 'es'
-              ? "\nINFORMACIÓN CRÍTICA: No se encontraron transacciones recientes en tu cuenta. DEBES informar esto al usuario.\n"
-              : "\nCRITICAL INFORMATION: No recent transactions found in your account. You MUST inform this to the user.\n";
-          }
-          else {
-            console.log(`Se encontraron ${data.length} transacciones`);
+          // Solo intentar consultar si tenemos una dirección
+          if (resolvedAddress) {
+            console.log(`Intentando consultar transacciones para dirección: ${resolvedAddress}`);
             
-            // Formatear transacciones de forma sencilla
-            const sent = data.filter(tx => tx.from_address === resolvedAddress);
-            const received = data.filter(tx => tx.to_address === resolvedAddress);
-            
-            // Añadir instrucción especial para que el modelo no responda prematuramente
-            extraContext += language === 'es'
-              ? "\n\nINSTRUCCIÓN IMPORTANTE: El usuario ha pedido explícitamente un resumen de transacciones. NO debes responder con mensajes como 'Claro, puedo hacer eso' o 'Déjame revisar'. DEBES proporcionar inmediatamente el resumen de transacciones que se detalla a continuación.\n\n"
-              : "\n\nIMPORTANT INSTRUCTION: The user has explicitly asked for a transaction summary. DO NOT respond with messages like 'Sure, I can do that' or 'Let me check'. You MUST immediately provide the transaction summary detailed below.\n\n";
-            
-            if (language === 'es') {
-              extraContext += `📊 Resumen de tus ${data.length} transacciones más recientes:\n`;
+            // Verificar conexión a Supabase
+            try {
+              const { count, error: countError } = await supabase
+                .from('transactions')
+                .select('*', { count: 'exact', head: true });
               
-              if (sent.length > 0) {
-                extraContext += `\n📤 Has enviado ${sent.length} transacciones:\n`;
-                sent.forEach((tx, index) => {
-                  const date = new Date(tx.created_at).toLocaleDateString();
-                  extraContext += `${index + 1}. ${tx.amount} ${tx.token || 'APT'} a ${tx.to_address} el ${date}\n`;
-                });
+              if (countError) {
+                console.error('ERROR AL CONECTAR CON SUPABASE:', countError);
+              } else {
+                console.log(`Conexión con Supabase OK. Cantidad estimada de registros: ${count}`);
               }
-              
-              if (received.length > 0) {
-                extraContext += `\n📥 Has recibido ${received.length} transacciones:\n`;
-                received.forEach((tx, index) => {
-                  const date = new Date(tx.created_at).toLocaleDateString();
-                  extraContext += `${index + 1}. ${tx.amount} ${tx.token || 'APT'} de ${tx.from_address} el ${date}\n`;
-                });
-              }
-            } else {
-              extraContext += `📊 Summary of your ${data.length} most recent transactions:\n`;
-              
-              if (sent.length > 0) {
-                extraContext += `\n📤 You've sent ${sent.length} transactions:\n`;
-                sent.forEach((tx, index) => {
-                  const date = new Date(tx.created_at).toLocaleDateString();
-                  extraContext += `${index + 1}. ${tx.amount} ${tx.token || 'APT'} to ${tx.to_address} on ${date}\n`;
-                });
-              }
-              
-              if (received.length > 0) {
-                extraContext += `\n📥 You've received ${received.length} transactions:\n`;
-                received.forEach((tx, index) => {
-                  const date = new Date(tx.created_at).toLocaleDateString();
-                  extraContext += `${index + 1}. ${tx.amount} ${tx.token || 'APT'} from ${tx.from_address} on ${date}\n`;
-                });
-              }
+            } catch (connError) {
+              console.error('ERROR CRÍTICO CONECTANDO A SUPABASE:', connError);
             }
+            
+            // Obtener directamente las transacciones de la base de datos
+            console.log('Ejecutando consulta SQL a la tabla "transactions"...');
+            const { data, error } = await supabase
+              .from('transactions')
+              .select(`
+                id,
+                from_address,
+                to_address,
+                amount,
+                token_type,
+                tx_hash,
+                status,
+                created_at
+              `)
+              .or(`from_address.eq.${resolvedAddress},to_address.eq.${resolvedAddress}`)
+              .order('created_at', { ascending: false })
+              .limit(limit);
+            
+            console.log('Consulta SQL completada.');
+            
+            if (error) {
+              console.error('ERROR AL CONSULTAR TRANSACCIONES:', error);
+              if (error.code) console.error(`Código de error: ${error.code}`);
+              if (error.message) console.error(`Mensaje de error: ${error.message}`);
+              if (error.details) console.error(`Detalles de error: ${error.details}`);
+              
+              extraContext += language === 'es'
+                ? "\nNo se pudieron obtener tus transacciones debido a un error en la base de datos.\n"
+                : "\nCould not retrieve your transactions due to a database error.\n";
+            }
+            else if (!data || data.length === 0) {
+              console.log('NO SE ENCONTRARON TRANSACCIONES para esta dirección');
+              
+              // Verificar si la dirección existe en alguna transacción
+              const { data: checkData, error: checkError } = await supabase
+                .from('transactions')
+                .select('id')
+                .or(`from_address.ilike.${resolvedAddress},to_address.ilike.${resolvedAddress}`)
+                .limit(1);
+              
+              if (checkError) {
+                console.error('Error al verificar la existencia de la dirección:', checkError);
+              } else {
+                console.log(`¿La dirección existe en alguna transacción? ${checkData && checkData.length > 0 ? 'SÍ' : 'NO'}`);
+              }
+              
+              extraContext += language === 'es'
+                ? "\nNo se encontraron transacciones recientes en tu cuenta.\n"
+                : "\nNo recent transactions found in your account.\n";
+            }
+            else {
+              console.log(`ÉXITO: Se encontraron ${data.length} transacciones`);
+              console.log('Primera transacción:', JSON.stringify(data[0]));
+              
+              // Formatear transacciones de forma sencilla
+              const sent = data.filter(tx => tx.from_address === resolvedAddress);
+              const received = data.filter(tx => tx.to_address === resolvedAddress);
+              
+              console.log(`Transacciones enviadas: ${sent.length}, Transacciones recibidas: ${received.length}`);
+              
+              // Añadir instrucción especial para que el modelo no responda prematuramente
+              extraContext += language === 'es'
+                ? "\n\nINSTRUCCIÓN IMPORTANTE: El usuario ha pedido explícitamente un resumen de transacciones. DEBES proporcionar inmediatamente el resumen de transacciones que se detalla a continuación.\n\n"
+                : "\n\nIMPORTANT INSTRUCTION: The user has explicitly asked for a transaction summary. You MUST immediately provide the transaction summary detailed below.\n\n";
+              
+              if (language === 'es') {
+                extraContext += `📊 Resumen de tus ${data.length} transacciones más recientes:\n`;
+                
+                if (sent.length > 0) {
+                  extraContext += `\n📤 Has enviado ${sent.length} transacciones:\n`;
+                  sent.forEach((tx, index) => {
+                    const date = new Date(tx.created_at).toLocaleDateString();
+                    const shortAddress = tx.to_address.substring(0, 6) + '...' + tx.to_address.substring(tx.to_address.length - 4);
+                    const tokenDisplay = tx.token_type ? (tx.token_type.includes('::') ? 'APT' : tx.token_type) : 'APT';
+                    extraContext += `${index + 1}. $$${tx.amount} ${tokenDisplay} a ${shortAddress} el ${date}\n`;
+                  });
+                }
+                
+                if (received.length > 0) {
+                  extraContext += `\n📥 Has recibido ${received.length} transacciones:\n`;
+                  received.forEach((tx, index) => {
+                    const date = new Date(tx.created_at).toLocaleDateString();
+                    const shortAddress = tx.from_address.substring(0, 6) + '...' + tx.from_address.substring(tx.from_address.length - 4);
+                    const tokenDisplay = tx.token_type ? (tx.token_type.includes('::') ? 'APT' : tx.token_type) : 'APT';
+                    extraContext += `${index + 1}. $$${tx.amount} ${tokenDisplay} de ${shortAddress} el ${date}\n`;
+                  });
+                }
+              } else {
+                extraContext += `📊 Summary of your ${data.length} most recent transactions:\n`;
+                
+                if (sent.length > 0) {
+                  extraContext += `\n📤 You've sent ${sent.length} transactions:\n`;
+                  sent.forEach((tx, index) => {
+                    const date = new Date(tx.created_at).toLocaleDateString();
+                    const shortAddress = tx.to_address.substring(0, 6) + '...' + tx.to_address.substring(tx.to_address.length - 4);
+                    const tokenDisplay = tx.token_type ? (tx.token_type.includes('::') ? 'APT' : tx.token_type) : 'APT';
+                    extraContext += `${index + 1}. $$${tx.amount} ${tokenDisplay} to ${shortAddress} on ${date}\n`;
+                  });
+                }
+                
+                if (received.length > 0) {
+                  extraContext += `\n📥 You've received ${received.length} transactions:\n`;
+                  received.forEach((tx, index) => {
+                    const date = new Date(tx.created_at).toLocaleDateString();
+                    const shortAddress = tx.from_address.substring(0, 6) + '...' + tx.from_address.substring(tx.from_address.length - 4);
+                    const tokenDisplay = tx.token_type ? (tx.token_type.includes('::') ? 'APT' : tx.token_type) : 'APT';
+                    extraContext += `${index + 1}. $$${tx.amount} ${tokenDisplay} from ${shortAddress} on ${date}\n`;
+                  });
+                }
+              }
+              
+              // Agregar enlace al explorador
+              extraContext += language === 'es' 
+                ? "\nVer en explorador: https://explorer.aptoslabs.com/account/" + resolvedAddress
+                : "\nView in explorer: https://explorer.aptoslabs.com/account/" + resolvedAddress;
+            }
+          } else {
+            console.error('NO HAY DIRECCIÓN DISPONIBLE para consultar transacciones');
+            extraContext += language === 'es'
+              ? "\nPara ver tus transacciones, necesito conocer tu dirección de wallet. Por favor, conecta tu wallet o proporciona tu dirección.\n"
+              : "\nTo view your transactions, I need to know your wallet address. Please connect your wallet or provide your address.\n";
           }
+          
+          // Para asegurarse de que el modelo no responda con "te mostraré las transacciones" sino con el resumen directamente
+          processedMessage = language === 'es' 
+            ? "RESPONDE DIRECTAMENTE CON LA INFORMACIÓN DE TRANSACCIONES"
+            : "RESPOND DIRECTLY WITH THE TRANSACTION INFORMATION";
+          
+          console.log('=== FIN DEL DIAGNÓSTICO ===');
         } catch (error) {
-          console.error('Error al procesar transacciones:', error);
+          console.error('ERROR CRÍTICO AL PROCESAR TRANSACCIONES:', error);
+          if (error instanceof Error) {
+            console.error('Mensaje de error:', error.message);
+            console.error('Stack trace:', error.stack);
+          }
           extraContext += language === 'es'
-            ? "\nINFORMACIÓN CRÍTICA: Ocurrió un error al procesar tus transacciones. DEBES informar al usuario que hubo un problema.\n"
-            : "\nCRITICAL INFORMATION: An error occurred while processing your transactions. You MUST inform the user that there was a problem.\n";
+            ? "\nOcurrió un error al procesar tus transacciones. Por favor, inténtalo más tarde.\n"
+            : "\nAn error occurred while processing your transactions. Please try again later.\n";
         }
-        
-        // Cambiar el mensaje original para forzar una respuesta directa
-        const actionPrefix = language === 'es' ? "Responde directamente con" : "Respond directly with";
-        processedMessage = `${actionPrefix}: ${processedMessage}`;
       }
       
       // 2. Si la intención es ayuda sobre la aplicación
