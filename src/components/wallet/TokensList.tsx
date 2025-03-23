@@ -19,7 +19,7 @@ interface TokensListProps {
 
 const TokensList: React.FC<TokensListProps> = ({ tokens }) => {
   return (
-    <div className="self-stretch w-full whitespace-nowrap flex-1 mt-8 rounded-xl">
+    <div className="flex flex-col w-full h-full overflow-y-auto p-3 space-y-3">
       {tokens.map((token) => (
         <TokenItem
           key={token.id}

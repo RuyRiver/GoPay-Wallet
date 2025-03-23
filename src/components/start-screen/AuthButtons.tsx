@@ -2,37 +2,35 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 import { useWeb3Auth } from "@/context/Web3AuthContext";
 import { useNavigate } from "react-router-dom";
+import styled from 'styled-components';
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary";
-  fullWidth?: boolean;
-}
+// Create a styled button directly without nesting styled components
+const StyledButton = styled.button`
+  width: 100%;
+  color: #ffffff;
+  padding: 0.7em 1.7em;
+  font-size: 18px;
+  border-radius: 1rem;
+  background-image: linear-gradient(to right, #464646, #000000);
+  cursor: pointer;
+  border: 1px solid #dadada;
+  transition: all 0.7s;
+  box-shadow:
+    6px 6px 12px #c5c5c5,
+    -6px -6px 12px #ffffff;
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  (
-    { className, variant = "primary", fullWidth = true, children, ...props },
-    ref,
-  ) => {
-    return (
-      <button
-        ref={ref}
-        className={cn(
-          "self-stretch shadow-[-2px_-7px_10px_rgba(241,241,241,1)] w-full gap-2.5 p-5 rounded-xl font-bold transition-colors",
-          variant === "primary"
-            ? "bg-black text-white hover:bg-gray-800"
-            : "bg-white text-black hover:bg-gray-100",
-          fullWidth ? "w-full" : "",
-          className,
-        )}
-        {...props}
-      >
-        {children}
-      </button>
-    );
-  },
-);
-
-Button.displayName = "Button";
+  &:active {
+    color: #000000;
+    box-shadow:
+      inset 21px 21px 21px #c5c5c5,
+      inset -21px -21px 21px #ffffff;
+  }
+  
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+`;
 
 interface AuthButtonsProps {
   className?: string;
@@ -53,14 +51,12 @@ export function AuthButtons({ className }: AuthButtonsProps) {
 
   return (
     <div className={cn("w-full text-base font-bold text-center", className)}>
-      <Button variant="primary" onClick={handleLogin} disabled={isLoading}>
+      <StyledButton onClick={handleLogin} disabled={isLoading}>
         {isLoading ? "Connecting..." : "Sign Up or Login"}
-      </Button>
+      </StyledButton>
       <p className="mt-2 text-sm font-normal text-gray-500">
         Powered by Web3Auth
       </p>
     </div>
   );
 }
-
-export { Button };

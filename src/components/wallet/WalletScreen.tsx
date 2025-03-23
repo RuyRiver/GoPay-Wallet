@@ -146,21 +146,34 @@ const WalletScreen: React.FC = () => {
   };
 
   return (
-    <div className="bg-[rgba(243,245,246,1)] flex max-w-[480px] w-full flex-col overflow-hidden items-center mx-auto pt-[53px] h-full">
+    <div className="bg-gray-50 flex flex-col h-screen w-full overflow-hidden fixed inset-0">
+      {/* Video Background */}
+      <div className="absolute inset-0 overflow-hidden z-0">
+        <video 
+          autoPlay 
+          loop 
+          muted 
+          playsInline
+          className="w-full h-full object-cover"
+        >
+          <source src="/bg/header-bg.webm" type="video/webm" />
+        </video>
+      </div>
+
       {/* Main view with animation */}
       {currentView === "main" && (
-        <div className={`flex flex-col items-center w-full transition-all duration-500 transform ${mainViewVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+        <div className={`relative z-10 flex flex-col items-center w-full h-full transition-all duration-500 transform ${mainViewVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           <Header 
             username={userInfo?.name || "User"} 
             balance={`$${totalUsdBalance}`}
             onSettingsClick={() => handleActionButton("Settings")}
           />
 
-          <div className="bg-white border flex min-h-[625px] w-full flex-col items-center pt-5 pb-[132px] px-[27px] rounded-[20px] border-[rgba(237,237,237,1)] border-solid">
+          <div className="bg-white border flex flex-1 w-full flex-col items-center p-3 rounded-t-[1.5rem] border-[rgba(237,237,237,1)] border-solid overflow-y-auto">
             <Tabs activeTab={activeTab} onTabChange={setActiveTab} />
 
             {activeTab === "tokens" ? (
-              <>
+              <div className="w-full flex-1 flex flex-col">
                 <TokensList tokens={tokens} />
                 <ActionButtons 
                   onSend={() => handleActionButton("Send")} 
@@ -168,9 +181,9 @@ const WalletScreen: React.FC = () => {
                   onDeposit={() => handleActionButton("Deposit")} 
                   onSwap={() => handleActionButton("Swap")} 
                 />
-              </>
+              </div>
             ) : (
-              <div className="self-stretch flex-1 w-full overflow-hidden">
+              <div className="self-stretch flex-1 w-full overflow-auto">
                 <TransactionHistory address={aptosAddress} />
               </div>
             )}

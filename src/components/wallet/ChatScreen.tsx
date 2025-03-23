@@ -98,7 +98,7 @@ const BotMessage: React.FC<{ content: string }> = ({ content }) => {
               rel="noopener noreferrer"
               className="text-blue-600 hover:underline"
             >
-              Ver en explorador
+              View in explorer
             </a>
           </div>
         )}
@@ -238,7 +238,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onClose, walletAddress }) => {
         id: (Date.now() + 100).toString(),
         content: response.success && response.data?.response.content 
           ? response.data.response.content 
-          : response.message || "No pude procesar tu solicitud.",
+          : response.message || "I couldn't process your request.",
         sender: 'bot',
         timestamp: new Date()
       };
@@ -284,16 +284,16 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onClose, walletAddress }) => {
             <path d="M19 12H5M12 19l-7-7 7-7"></path>
           </svg>
         </button>
-        <h2 className="text-lg font-semibold mx-auto">Move AI Wallet</h2>
+        <h2 className="text-lg font-semibold mx-auto">GoPay Agent</h2>
         <div className="w-8">
           {serviceStatus === 'checking' && (
-            <div className="h-3 w-3 rounded-full bg-yellow-500 mx-auto animate-pulse" title="Verificando estado del servicio" />
+            <div className="h-3 w-3 rounded-full bg-yellow-500 mx-auto animate-pulse" title="Checking service status" />
           )}
           {serviceStatus === 'online' && (
-            <div className="h-3 w-3 rounded-full bg-green-500 mx-auto" title="Servicio en línea" />
+            <div className="h-3 w-3 rounded-full bg-green-500 mx-auto" title="Service online" />
           )}
           {serviceStatus === 'offline' && (
-            <div className="h-3 w-3 rounded-full bg-red-500 mx-auto" title="Servicio fuera de línea" />
+            <div className="h-3 w-3 rounded-full bg-red-500 mx-auto" title="Service offline" />
           )}
         </div>
       </div>
@@ -325,7 +325,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onClose, walletAddress }) => {
           <div className="h-full flex flex-col items-center justify-center p-6">
             <div className="bg-red-100 text-red-800 p-4 rounded-lg mb-4">
               <p className="text-center">
-                Lo sentimos, el servicio de Move Agent no está disponible en este momento. Por favor, inténtalo más tarde.
+                Sorry, the Move Agent service is not available at this time. Please try again later.
               </p>
             </div>
           </div>
@@ -345,9 +345,9 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onClose, walletAddress }) => {
                 onClick={() => handleSuggestionClick("I want to send money to a friend")}
               />
               <ChatSuggestion 
-                title="Información" 
-                description="Aprende sobre criptomonedas"
-                onClick={() => handleSuggestionClick("Explícame qué es Aptos")}
+                title="Information" 
+                description="Learn about cryptocurrencies"
+                onClick={() => handleSuggestionClick("What is Aptos?")}
               />
             </ScrollArea>
           </div>

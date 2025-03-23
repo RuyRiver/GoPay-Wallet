@@ -92,7 +92,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ address }) => {
 
   if (transactions.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-full p-8">
+      <div className="self-stretch flex flex-col w-full h-full overflow-y-auto p-3 space-y-3">
         <Clock className="h-12 w-12 text-gray-300 mb-4" />
         <p className="text-gray-500 text-center">
           No transactions to show. When you send or receive tokens, they will appear here.
@@ -102,7 +102,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ address }) => {
   }
 
   return (
-    <div className="flex flex-col w-full h-full overflow-y-auto p-3 space-y-3">
+    <div className="self-stretch flex flex-col w-full h-full overflow-y-auto p-3 space-y-3">
       {transactions.map((tx) => (
         <div
           key={tx.id}
@@ -138,8 +138,8 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ address }) => {
             <div className="flex justify-between items-end mt-1">
               <span className="text-xs text-gray-500 truncate">
                 {isSender(tx)
-                  ? `A: ${shortenAddress(tx.to_address)}`
-                  : `De: ${shortenAddress(tx.from_address)}`}
+                  ? `To: ${shortenAddress(tx.to_address)}`
+                  : `From: ${shortenAddress(tx.from_address)}`}
               </span>
               <span className="text-xs text-gray-400">
                 {formatTime(tx.created_at)}
