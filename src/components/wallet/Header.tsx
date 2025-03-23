@@ -24,16 +24,16 @@ const Header: React.FC<HeaderProps> = ({
       <div className="relative z-10 self-stretch flex w-full items-center text-2xl text-black font-bold whitespace-nowrap justify-between px-5 py-3">
         <Button 
           variant="ghost" 
-          size="lg" 
-          className="p-0 h-10 w-10" 
+          size="icon" 
+          className="p-0 h-8 w-8" 
           aria-label="Account Settings"
           onClick={onSettingsClick}
         >
-          <Settings className="w-6 h-6 stroke-[1.5px]" />
+          <Settings className="w-5 h-5 stroke-[1.5px]" />
         </Button>
         <div className="self-stretch my-auto">{username}</div>
-        <Button variant="ghost" size="lg" className="p-0 h-10 w-10" aria-label="Scan">
-          <ScanSearch className="w-6 h-6 stroke-[1.5px]" />
+        <Button variant="ghost" size="icon" className="p-0 h-8 w-8" aria-label="Scan">
+          <ScanSearch className="w-5 h-5 stroke-[1.5px]" />
         </Button>
       </div>
       <div className="relative z-10 py-12 self-stretch flex flex-col justify-center items-center text-white tracking-[0.2px]">

@@ -31,7 +31,7 @@ const TokenItem: React.FC<TokenItemProps> = ({
             alt={name}
           />
           <div className="flex flex-col items-stretch">
-            <div className="text-[rgba(39,39,41,1)] text-base font-semibold text-center">
+            <div className="text-[rgba(39,39,41,1)] text-base font-semibold text-left">
               {name}
             </div>
             <div className="flex gap-1 text-xs font-normal mt-1">
@@ -55,12 +55,12 @@ const TokenItem: React.FC<TokenItemProps> = ({
             </div>
           </div>
         </div>
-        <div className="flex flex-col text-center">
+        <div className="flex flex-col text-right">
           <div className="flex gap-1 text-base text-[rgba(39,39,41,1)] font-semibold">
             <div className="tracking-[0.2px]">{amount}</div>
             <div>{symbol}</div>
           </div>
-          <div className="text-[rgba(140,141,153,1)] text-xs font-normal mt-1">
+          <div className="text-[rgba(140,141,153,1)] text-xs font-normal text-right mt-1">
             {value}
           </div>
         </div>

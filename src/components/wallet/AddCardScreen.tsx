@@ -113,7 +113,7 @@ const AddCardScreen: React.FC<AddCardScreenProps> = ({ onClose, onAddCard }) => 
                   <div>{expiryDate || "MM/YY"}</div>
                 </div>
                 <div className="text-lg font-medium">
-                  {cardholderName || "User Name"}
+                  {cardholderName || "Card Holder"}
                 </div>
               </div>
             </div>

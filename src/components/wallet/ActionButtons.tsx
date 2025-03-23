@@ -1,5 +1,6 @@
 import React from "react";
 import ActionButton from "./ActionButton";
+import { ArrowDown } from "lucide-react";
 
 interface ActionButtonsProps {
   onSend?: () => void;
@@ -14,6 +15,10 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
   onDeposit,
   onSwap,
 }) => {
+  // Convert the Lucide ArrowDown icon to a data URL
+  const arrowDownSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"></path><path d="m19 12-7 7-7-7"></path></svg>`;
+  const receiveIconUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(arrowDownSvg)}`;
+
   return (
     <div className="flex gap-[34px] my-4 justify-center w-full">
       <ActionButton
@@ -22,7 +27,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
         onClick={onSend}
       />
       <ActionButton
-        icon="https://cdn.builder.io/api/v1/image/assets/20e65f047558427aa511c5569cf902c1/583bfdb9e9b7d6bfa262d869574a749ecc66e6ee?placeholderIfAbsent=true"
+        icon={receiveIconUrl}
         label="Receive"
         onClick={onReceive}
       />
