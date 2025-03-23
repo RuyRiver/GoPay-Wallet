@@ -138,8 +138,8 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ address }) => {
             <div className="flex justify-between items-end mt-1">
               <span className="text-xs text-gray-500 truncate">
                 {isSender(tx)
-                  ? `A: ${shortenAddress(tx.to_address)}`
-                  : `De: ${shortenAddress(tx.from_address)}`}
+                  ? `To: ${shortenAddress(tx.to_address)}`
+                  : `From: ${shortenAddress(tx.from_address)}`}
               </span>
               <span className="text-xs text-gray-400">
                 {formatTime(tx.created_at)}
