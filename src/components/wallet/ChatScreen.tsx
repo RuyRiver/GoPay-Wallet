@@ -284,7 +284,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onClose, walletAddress }) => {
             <path d="M19 12H5M12 19l-7-7 7-7"></path>
           </svg>
         </button>
-        <h2 className="text-lg font-semibold mx-auto">Move AI Wallet</h2>
+        <h2 className="text-lg font-semibold mx-auto">GoPay Agent</h2>
         <div className="w-8">
           {serviceStatus === 'checking' && (
             <div className="h-3 w-3 rounded-full bg-yellow-500 mx-auto animate-pulse" title="Checking service status" />
