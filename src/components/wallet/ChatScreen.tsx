@@ -39,6 +39,7 @@ const ChatSuggestion: React.FC<SuggestionProps> = ({ title, description, onClick
 );
 
 const UserMessage: React.FC<{ content: string }> = ({ content }) => {
+  const { userInfo } = useWeb3Auth();
   // Determinar si el contenido puede contener una transacción a partir del texto
   const mayContainTransaction = content.toLowerCase().includes('transfer') || 
                                content.toLowerCase().includes('send') || 
@@ -50,7 +51,13 @@ const UserMessage: React.FC<{ content: string }> = ({ content }) => {
         <p className="whitespace-pre-wrap break-words text-sm">{content}</p>
       </div>
       <Avatar className="h-10 w-10 bg-gray-300 self-start">
-        <div className="h-10 w-10 rounded-full bg-gray-300"></div>
+        {userInfo?.profileImage ? (
+          <img src={userInfo.profileImage} alt="User" className="h-10 w-10 rounded-full object-cover" />
+        ) : (
+          <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-600">
+            {userInfo?.name?.charAt(0) || 'U'}
+          </div>
+        )}
       </Avatar>
     </div>
   );

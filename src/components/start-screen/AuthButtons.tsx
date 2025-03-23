@@ -54,11 +54,11 @@ export function AuthButtons({ className }: AuthButtonsProps) {
   return (
     <div className={cn("w-full text-base font-bold text-center", className)}>
       <Button variant="primary" onClick={handleLogin} disabled={isLoading}>
-        {isLoading ? "Connecting..." : "Sign Up"}
+        {isLoading ? "Connecting..." : "Sign Up or Login"}
       </Button>
-      <Button variant="secondary" className="mt-5" onClick={handleLogin} disabled={isLoading}>
-        {isLoading ? "Connecting..." : "Log In"}
-      </Button>
+      <p className="mt-2 text-sm font-normal text-gray-500">
+        Powered by Web3Auth
+      </p>
     </div>
   );
 }

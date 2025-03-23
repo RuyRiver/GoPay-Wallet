@@ -1,7 +1,5 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
-import { useWeb3Auth } from "@/context/Web3AuthContext";
-import { useNavigate } from "react-router-dom";
 
 interface SocialButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -38,37 +36,11 @@ interface SocialLoginProps {
 }
 
 export function SocialLogin({ className }: SocialLoginProps) {
-  const { login, isLoading } = useWeb3Auth();
-  const navigate = useNavigate();
-
-  const handleSocialLogin = async () => {
-    try {
-      await login();
-      navigate("/wallet");
-    } catch (error) {
-      console.error("Social login failed:", error);
-    }
-  };
-
   return (
     <div className={cn("w-full text-[#1E1E1E] text-center", className)}>
-      <SocialButton
-        icon="https://cdn.builder.io/api/v1/image/assets/20e65f047558427aa511c5569cf902c1/26f237a5d98957bf23644bdde3e7fcc237dc199d?placeholderIfAbsent=true"
-        iconAlt="Google logo"
-        onClick={handleSocialLogin}
-        disabled={isLoading}
-      >
-        {isLoading ? "Connecting..." : "Continue with Google"}
-      </SocialButton>
-      <SocialButton
-        icon="https://cdn.builder.io/api/v1/image/assets/20e65f047558427aa511c5569cf902c1/fe21fb5edecbe36e43c8c767231312459a09abca?placeholderIfAbsent=true"
-        iconAlt="Facebook logo"
-        className="mt-5"
-        onClick={handleSocialLogin}
-        disabled={isLoading}
-      >
-        {isLoading ? "Connecting..." : "Continue with Facebook"}
-      </SocialButton>
+      <p className="text-sm text-gray-500 mb-3">
+        Social login options available through Web3Auth
+      </p>
     </div>
   );
 }

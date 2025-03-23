@@ -13,6 +13,7 @@ import SettingsScreen from "./SettingsScreen";
 import AnimatedView from "@/components/ui/AnimatedView";
 import { useWeb3Auth } from "@/context/Web3AuthContext";
 import { requestAirdrop } from "@/utils/aptos";
+import TransactionHistory from "./TransactionHistory";
 
 const WalletScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState("tokens");
@@ -169,10 +170,8 @@ const WalletScreen: React.FC = () => {
                 />
               </>
             ) : (
-              <div className="relative self-stretch flex items-center justify-center h-full w-full py-0">
-                <p className="text-gray-500">
-                  Transaction history will appear here
-                </p>
+              <div className="self-stretch flex-1 w-full overflow-hidden">
+                <TransactionHistory address={aptosAddress} />
               </div>
             )}
           </div>

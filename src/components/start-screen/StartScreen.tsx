@@ -1,9 +1,6 @@
-
 import * as React from "react";
 import { Logo } from "./Logo";
 import { AuthButtons } from "./AuthButtons";
-import { SocialLogin } from "./SocialLogin";
-import { Divider } from "@/components/ui/divider";
 
 export function StartScreen() {
   return (
@@ -25,13 +22,6 @@ export function StartScreen() {
 
         <div className="w-full text-base font-bold mt-8">
           <AuthButtons />
-
-          <Divider
-            text="Or"
-            className="text-[#838383] font-normal whitespace-nowrap mt-10"
-          />
-
-          <SocialLogin className="mt-10" />
         </div>
       </div>
     </section>

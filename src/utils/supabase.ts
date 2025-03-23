@@ -171,4 +171,30 @@ export const createDefaultAgentLimits = async (address: string): Promise<boolean
     console.error('Exception al crear límites de agente:', error);
     return false;
   }
+};
+
+/**
+ * Obtiene el historial de transacciones para una dirección
+ * @param address Dirección de wallet del usuario
+ * @returns Lista de transacciones o null si hay error
+ */
+export const getTransactionHistory = async (address: string) => {
+  try {
+    // Obtener transacciones donde la dirección es remitente o destinatario
+    const { data, error } = await supabase
+      .from('transactions')
+      .select('*')
+      .or(`from_address.eq.${address},to_address.eq.${address}`)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching transaction history from Supabase:', error);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Exception when fetching transaction history:', error);
+    return null;
+  }
 }; 
