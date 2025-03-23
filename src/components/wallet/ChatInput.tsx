@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Send } from "lucide-react";
 
 interface ChatInputProps {
   onSendMessage?: (message: string) => void;
@@ -17,19 +18,19 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, onInputClick, isLo
   };
 
   return (
-    <div className="z-10 flex mt-[-109px] w-full items-center gap-6 pt-5 pb-[41px] px-7 border-[rgba(244,244,244,1)] border-t">
+    <div className="z-10 flex w-full items-center gap-3 p-4 border-t border-[rgba(244,244,244,1)] bg-white">
       <div 
-        className="bg-[rgba(232,232,232,1)] shadow-[20px_20px_60px_rgba(197,197,197,1)] self-stretch flex min-w-60 items-center gap-2.5 text-[13px] text-[rgba(117,117,117,1)] font-normal flex-1 shrink basis-[0%] my-auto px-4 py-[15px] rounded-2xl"
+        className="bg-[rgba(248,248,248,1)] self-stretch flex items-center gap-2.5 flex-1 px-4 py-3 rounded-full shadow-sm border border-gray-200"
       >
         <img
           src="/lovable-uploads/3992c85c-5a2a-4d3f-8961-b8b8f7f07838.png"
-          className="aspect-[1] object-contain w-4 self-stretch shrink-0 my-auto"
+          className="aspect-[1] object-contain w-5 h-5 shrink-0"
           alt="Bot"
         />
         <input
           type="text"
-          className="bg-transparent outline-none w-full"
-          placeholder="How can help you?"
+          className="bg-transparent outline-none w-full text-sm placeholder:text-gray-400"
+          placeholder="Escribe un mensaje..."
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSend()}
@@ -37,22 +38,20 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, onInputClick, isLo
             e.stopPropagation();
             if (onInputClick) onInputClick();
           }}
+          disabled={isLoading}
         />
       </div>
       <button
-        className={`shadow-[-2px_-7px_10px_rgba(241,241,241,1)] self-stretch flex items-center justify-center gap-2.5 w-12 my-auto p-3 rounded-[30px] ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+        className={`flex items-center justify-center gap-2.5 w-10 h-10 bg-primary text-white rounded-full shadow-sm transition-all
+          ${isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary/90 active:scale-95'}`}
         onClick={handleSend}
-        disabled={isLoading}
+        disabled={isLoading || !message.trim()}
         aria-label="Send message"
       >
         {isLoading ? (
-          <div className="h-6 w-6 rounded-full border-2 border-t-transparent border-blue-500 animate-spin" />
+          <div className="h-5 w-5 rounded-full border-2 border-t-transparent border-white animate-spin" />
         ) : (
-          <img
-            src="https://cdn.builder.io/api/v1/image/assets/20e65f047558427aa511c5569cf902c1/a6cc5e478f9e2b60db24893cea89233c8dea549b?placeholderIfAbsent=true"
-            className="aspect-[1] object-contain w-6 self-stretch my-auto"
-            alt="Send"
-          />
+          <Send className="h-5 w-5" />
         )}
       </button>
     </div>
