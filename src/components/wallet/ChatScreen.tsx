@@ -333,16 +333,16 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onClose, walletAddress }) => {
           // Sugerencias iniciales
           <div className="flex flex-col h-full">
             <ScrollArea className="flex-1 p-6">
-              <h3 className="text-lg font-semibold mb-6">¿En qué puedo ayudarte hoy?</h3>
+              <h3 className="text-lg font-semibold mb-6">How can I help you today?</h3>
               <ChatSuggestion 
-                title="Ver balance" 
-                description="Consulta el saldo de tu cuenta"
-                onClick={() => handleSuggestionClick("Muéstrame el balance de mi cuenta")}
+                title="View balance" 
+                description="Check your account balance"
+                onClick={() => handleSuggestionClick("Show me my account balance")}
               />
               <ChatSuggestion 
-                title="Enviar dinero" 
-                description="Transfiere fondos a otra cuenta"
-                onClick={() => handleSuggestionClick("Quiero enviar dinero a un amigo")}
+                title="Send money" 
+                description="Transfer funds to another account"
+                onClick={() => handleSuggestionClick("I want to send money to a friend")}
               />
               <ChatSuggestion 
                 title="Información" 
