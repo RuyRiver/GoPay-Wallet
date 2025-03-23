@@ -58,13 +58,17 @@ const AnimatedView: React.FC<AnimatedViewProps> = ({
       }`}
       style={{
         perspective: '1000px',
+        height: 'calc(var(--vh, 1vh) * 100)'
       }}
     >
       <div 
         className={`fixed inset-0 flex items-center justify-center overflow-hidden`}
+        style={{
+          height: 'calc(var(--vh, 1vh) * 100)'
+        }}
       >
         <div 
-          className={`relative w-full max-w-md h-[85vh] bg-white flex flex-col overflow-hidden rounded-xl shadow-xl transition-all duration-700 ease-out transform ${show ? `${translateActiveClass} animate-spring-in-${direction}` : `${translateClass} animate-spring-out-${direction}`}`}
+          className={`relative w-full max-w-md h-85vh-real bg-white flex flex-col overflow-hidden rounded-xl shadow-xl transition-all duration-700 ease-out transform ${show ? `${translateActiveClass} animate-spring-in-${direction}` : `${translateClass} animate-spring-out-${direction}`}`}
           style={{
             transformStyle: 'preserve-3d',
             backfaceVisibility: 'hidden',

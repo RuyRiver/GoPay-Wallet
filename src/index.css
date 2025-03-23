@@ -99,3 +99,44 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Real viewport height utilities */
+.h-screen-real {
+  height: 100vh; /* Fallback */
+  height: calc(var(--vh, 1vh) * 100);
+}
+
+.min-h-screen-real {
+  min-height: 100vh; /* Fallback */
+  min-height: calc(var(--vh, 1vh) * 100);
+}
+
+.max-h-screen-real {
+  max-height: 100vh; /* Fallback */
+  max-height: calc(var(--vh, 1vh) * 100);
+}
+
+/* For specific percentage-based heights */
+.h-90vh-real {
+  height: 90vh; /* Fallback */
+  height: calc(var(--vh, 1vh) * 90);
+}
+
+.h-85vh-real {
+  height: 85vh; /* Fallback */
+  height: calc(var(--vh, 1vh) * 85);
+}
+
+/* Fix for mobile browsers with UI elements */
+html, body {
+  overflow-x: hidden;
+  position: relative;
+  width: 100%;
+}
+
+/* Fix for iOS Safari specifically */
+@supports (-webkit-touch-callout: none) {
+  .h-screen, .min-h-screen, .max-h-screen {
+    height: -webkit-fill-available;
+  }
+}

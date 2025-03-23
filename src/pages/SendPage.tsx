@@ -27,7 +27,7 @@ const SendPage: React.FC = () => {
   // Show spinner while verifying login status
   if (isLoading || !isInitialized) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="min-h-screen-real flex items-center justify-center bg-gray-100">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900"></div>
       </div>
     );
@@ -39,7 +39,7 @@ const SendPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+    <div className="min-h-screen-real flex items-center justify-center bg-gray-100 p-4">
       <div className="bg-[rgba(243,245,246,1)] flex max-w-[480px] w-full flex-col overflow-hidden items-stretch mx-auto h-full">
         <SendScreen 
           onClose={() => navigate("/wallet")} 
