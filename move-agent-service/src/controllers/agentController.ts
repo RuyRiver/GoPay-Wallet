@@ -113,9 +113,39 @@ export const agentController = {
         console.warn('ADVERTENCIA: OPENROUTER_API_KEY no está configurada. Las respuestas de IA pueden ser limitadas.');
       }
       
+      // Si el mensaje contiene palabras clave relacionadas con transacciones, obtener un resumen
+      let transactionContext = "";
+      if (resolvedAddress && 
+          (message.toLowerCase().includes('transaccion') || 
+           message.toLowerCase().includes('transferencia') || 
+           message.toLowerCase().includes('envio') || 
+           message.toLowerCase().includes('recibido') || 
+           message.toLowerCase().includes('historial') ||
+           message.toLowerCase().includes('movimientos') ||
+           message.toLowerCase().includes('resumen'))) {
+        try {
+          // Obtener resumen de transacciones recientes
+          const transactions = await userService.getTransactionSummary(resolvedAddress, 3);
+          if (transactions && transactions.length > 0) {
+            transactionContext = "\nResumen de tus últimas transacciones:\n";
+            transactions.forEach((tx, index) => {
+              transactionContext += `${index + 1}. ${tx.type === 'enviada' ? 'Enviaste' : 'Recibiste'} ${tx.amount} ${tx.token} ${tx.type === 'enviada' ? 'a' : 'de'} ${tx.counterparty} (${tx.date}) - Estado: ${tx.status}\n`;
+            });
+          }
+          console.log("Añadiendo contexto de transacciones:", transactionContext);
+        } catch (error) {
+          console.error('Error al obtener resumen de transacciones:', error);
+        }
+      }
+      
+      // Preparar mensaje enriquecido con contexto
+      const enrichedMessage = transactionContext.length > 0 
+        ? `${message}\n\n${transactionContext}` 
+        : message;
+      
       // Procesar el mensaje usando el servicio move-agent-kit con OpenRouter
       const result = await moveAgentService.processMessage(
-        message, 
+        enrichedMessage, 
         resolvedAddress,
         privateKeyHalf
       );
@@ -128,7 +158,7 @@ export const agentController = {
         message: 'Mensaje procesado correctamente con OpenRouter',
         data: {
           response: result,
-          processedMessage: message,
+          processedMessage: enrichedMessage,
           originalMessage: message,
           model: process.env.MODEL_NAME || 'openrouter/anthropic/claude-3-opus-20240229'
         }

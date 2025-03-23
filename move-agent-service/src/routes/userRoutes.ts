@@ -21,4 +21,7 @@ router.get('/', userController.getAllUsers);
 // Verificar si un correo electrónico está registrado
 router.get('/check-email/:email', userController.checkEmailExists);
 
+// Obtener resumen de transacciones
+router.post('/transaction-summary', userController.getTransactionSummary);
+
 export default router; 

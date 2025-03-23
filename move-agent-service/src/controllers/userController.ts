@@ -185,5 +185,41 @@ export const userController = {
         message: error.message || 'Error al verificar correo electrónico'
       } as ApiResponse);
     }
+  },
+
+  /**
+   * Obtener un resumen de las últimas transacciones del usuario
+   * @param req Request
+   * @param res Response
+   */
+  async getTransactionSummary(req: Request, res: Response): Promise<void> {
+    try {
+      const { address } = req.body;
+      const limit = req.body.limit ? parseInt(req.body.limit) : 5;
+      
+      if (!address) {
+        res.status(400).json({
+          success: false,
+          message: 'Se requiere la dirección de la wallet'
+        } as ApiResponse);
+        return;
+      }
+      
+      const summary = await userService.getTransactionSummary(address, limit);
+      
+      res.json({
+        success: true,
+        message: 'Resumen de transacciones obtenido correctamente',
+        data: {
+          summary
+        }
+      } as ApiResponse<{ summary: any[] }>);
+    } catch (error: any) {
+      console.error('Error al obtener resumen de transacciones:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Error al obtener resumen de transacciones'
+      } as ApiResponse);
+    }
   }
 }; 

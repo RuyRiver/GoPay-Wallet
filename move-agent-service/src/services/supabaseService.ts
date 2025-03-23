@@ -378,5 +378,85 @@ export const userService = {
       // En caso de error, permitimos la transacción para no bloquear al usuario
       return { allowed: true, message: 'Error al verificar límites, transacción permitida' };
     }
+  },
+
+  /**
+   * Obtener el historial de transacciones para una dirección
+   * @param address Dirección del usuario
+   * @param limit Número máximo de transacciones a devolver (opcional)
+   * @returns Lista de transacciones o array vacío si hubo error
+   */
+  async getTransactionHistory(address: string, limit: number = 10): Promise<any[]> {
+    try {
+      const query = supabase
+        .from('transactions')
+        .select(`
+          id,
+          from_address,
+          to_address,
+          amount,
+          token,
+          status,
+          created_at,
+          from_users:users!from_address(email, name),
+          to_users:users!to_address(email, name)
+        `)
+        .or(`from_address.eq.${address},to_address.eq.${address}`)
+        .order('created_at', { ascending: false });
+      
+      // Aplicar límite si se especifica
+      if (limit > 0) {
+        query.limit(limit);
+      }
+      
+      const { data, error } = await query;
+      
+      if (error) {
+        console.error('Error al obtener historial de transacciones:', error);
+        return [];
+      }
+      
+      return data || [];
+    } catch (error) {
+      console.error('Error inesperado al obtener historial de transacciones:', error);
+      return [];
+    }
+  },
+  
+  /**
+   * Obtener un resumen de las últimas transacciones de un usuario
+   * @param address Dirección del usuario
+   * @param limit Número máximo de transacciones a incluir en el resumen (opcional)
+   * @returns Resumen formateado de transacciones
+   */
+  async getTransactionSummary(address: string, limit: number = 5): Promise<any[]> {
+    try {
+      const transactions = await this.getTransactionHistory(address, limit);
+      
+      // Formatear las transacciones para el resumen
+      return transactions.map(tx => {
+        const isOutgoing = tx.from_address === address;
+        const counterpartyAddress = isOutgoing ? tx.to_address : tx.from_address;
+        
+        // Intentar obtener información de la contraparte
+        const counterpartyInfo = isOutgoing ? tx.to_users : tx.from_users;
+        const counterpartyName = counterpartyInfo && counterpartyInfo.length > 0
+          ? (counterpartyInfo[0].name || counterpartyInfo[0].email)
+          : null;
+        
+        return {
+          id: tx.id,
+          type: isOutgoing ? 'enviada' : 'recibida',
+          amount: tx.amount,
+          token: tx.token,
+          counterparty: counterpartyName || counterpartyAddress,
+          date: new Date(tx.created_at).toLocaleDateString(),
+          status: tx.status
+        };
+      });
+    } catch (error) {
+      console.error('Error al generar resumen de transacciones:', error);
+      return [];
+    }
   }
 }; 
