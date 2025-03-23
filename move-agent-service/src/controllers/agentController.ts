@@ -19,7 +19,7 @@ export const agentController = {
       if (!message) {
         res.status(400).json({ 
           success: false, 
-          message: 'Se requiere un mensaje para procesar' 
+          message: 'A message is required to proceed' 
         } as ApiResponse);
         return;
       }
@@ -67,7 +67,7 @@ export const agentController = {
       console.error('Error al procesar la instrucción:', error);
       res.status(500).json({ 
         success: false, 
-        message: error.message || 'Error al procesar la instrucción' 
+        message: error.message || 'Error to process the instruction' 
       } as ApiResponse);
     }
   },
@@ -86,7 +86,7 @@ export const agentController = {
         res.status(400).json({ 
           success: false,
           error: 'Se requiere un mensaje',
-          message: 'No se proporcionó ningún mensaje para procesar'
+          message: 'None message provided'
         });
         return;
       }
@@ -127,7 +127,7 @@ export const agentController = {
           // Obtener resumen de transacciones recientes
           const transactions = await userService.getTransactionSummary(resolvedAddress, 3);
           if (transactions && transactions.length > 0) {
-            transactionContext = "\nResumen de tus últimas transacciones:\n";
+            transactionContext = "\nLast transactions:\n";
             transactions.forEach((tx, index) => {
               transactionContext += `${index + 1}. ${tx.type === 'enviada' ? 'Enviaste' : 'Recibiste'} ${tx.amount} ${tx.token} ${tx.type === 'enviada' ? 'a' : 'de'} ${tx.counterparty} (${tx.date}) - Estado: ${tx.status}\n`;
             });

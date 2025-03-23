@@ -308,16 +308,16 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onClose, walletAddress }) => {
               alt="GoPay" 
               className="w-24 h-24 mb-6" 
             />
-            <h3 className="text-xl font-bold mb-4 text-center">¡Hola! Soy tu asistente financiero</h3>
+            <h3 className="text-xl font-bold mb-4 text-center">Hi! I'm your financial assistant</h3>
             <p className="text-gray-500 mb-8 text-center">
-              Puedo ayudarte a gestionar tus finanzas, realizar transacciones y responder tus preguntas sobre criptomonedas.
+              I can help you manage your finances, make transactions, and answer your questions about cryptocurrencies.
             </p>
             <Button 
               className="w-full max-w-xs" 
               onClick={handleContinue}
               disabled={isLoading}
             >
-              {isLoading ? "Configurando..." : "Empezar a Chatear"}
+              {isLoading ? "Configuring..." : "Start Chatting"}
             </Button>
           </div>
         ) : serviceStatus === 'offline' ? (

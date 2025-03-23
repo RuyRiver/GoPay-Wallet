@@ -67,14 +67,14 @@ const SendScreen: React.FC<SendScreenProps> = ({ onClose, initialAddress = null 
 
   const handleSend = async () => {
     if (!recipient || !amount || !aptosAccount) {
-      setError("Por favor, introduce una dirección o email válido y un monto");
+      setError("Please enter a valid address or email and amount");
       return;
     }
 
     // Check if amount is more than balance
     const balanceInApt = aptosBalance / 100000000;
     if (parseFloat(amount) > balanceInApt) {
-      setError("Saldo insuficiente");
+      setError("Insufficient balance");
       return;
     }
 
@@ -204,7 +204,7 @@ const SendScreen: React.FC<SendScreenProps> = ({ onClose, initialAddress = null 
               
               {isEmailMode && emailExists === true && (
                 <p className="text-xs text-green-500 mt-1">
-                  Usuario encontrado. Los APT se enviarán a su dirección asociada.
+                  User found. APT will be sent to their associated address.
                 </p>
               )}
             </div>

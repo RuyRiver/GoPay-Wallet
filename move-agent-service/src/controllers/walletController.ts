@@ -1,5 +1,5 @@
 /**
- * Controlador para operaciones de wallet
+ * Controller for wallet operations
  */
 import { Request, Response } from 'express';
 import { moveAgentService } from '../services/moveAgentService';
@@ -7,7 +7,7 @@ import { ApiResponse, BalanceResponse, SendTokenRequest, SendTokenByEmailRequest
 
 export const walletController = {
   /**
-   * Obtener el balance de una dirección
+   * Get the balance of an address
    * @param req Request
    * @param res Response
    */
@@ -18,7 +18,7 @@ export const walletController = {
       if (!address) {
         res.status(400).json({
           success: false,
-          message: 'Se requiere una dirección'
+          message: 'An address is required'
         } as ApiResponse);
         return;
       }
@@ -27,20 +27,20 @@ export const walletController = {
       
       res.json({
         success: true,
-        message: 'Balance obtenido correctamente',
+        message: 'Balance retrieved successfully',
         data: balance
       } as ApiResponse<BalanceResponse>);
     } catch (error: any) {
-      console.error('Error al obtener balance:', error);
+      console.error('Error getting balance:', error);
       res.status(500).json({
         success: false,
-        message: error.message || 'Error al obtener balance'
+        message: error.message || 'Error getting balance'
       } as ApiResponse);
     }
   },
   
   /**
-   * Enviar tokens
+   * Send tokens
    * @param req Request
    * @param res Response
    */
@@ -51,7 +51,7 @@ export const walletController = {
       if (!fromAddress || !toAddress || amount === undefined) {
         res.status(400).json({
           success: false,
-          message: 'Se requieren fromAddress, toAddress y amount'
+          message: 'fromAddress, toAddress and amount are required'
         } as ApiResponse);
         return;
       }
@@ -67,7 +67,7 @@ export const walletController = {
       if (result.status === 'error') {
         res.status(400).json({
           success: false,
-          message: result.message || 'Error al enviar tokens',
+          message: result.message || 'Error sending tokens',
           data: result
         } as ApiResponse<TransactionResponse>);
         return;
@@ -75,20 +75,20 @@ export const walletController = {
       
       res.json({
         success: true,
-        message: `Se han enviado ${amount} ${tokenType || 'APT'} a ${toAddress}`,
+        message: `${amount} ${tokenType || 'APT'} have been sent to ${toAddress}`,
         data: result
       } as ApiResponse<TransactionResponse>);
     } catch (error: any) {
-      console.error('Error al enviar tokens:', error);
+      console.error('Error sending tokens:', error);
       res.status(500).json({
         success: false,
-        message: error.message || 'Error al enviar tokens'
+        message: error.message || 'Error sending tokens'
       } as ApiResponse);
     }
   },
   
   /**
-   * Enviar tokens usando correo electrónico como destinatario
+   * Send tokens using email as recipient
    * @param req Request
    * @param res Response
    */
@@ -99,7 +99,7 @@ export const walletController = {
       if (!fromAddress || !toEmail || amount === undefined) {
         res.status(400).json({
           success: false,
-          message: 'Se requieren fromAddress, toEmail y amount'
+          message: 'fromAddress, toEmail and amount are required'
         } as ApiResponse);
         return;
       }
@@ -115,7 +115,7 @@ export const walletController = {
       if (result.status === 'error') {
         res.status(400).json({
           success: false,
-          message: result.message || 'Error al enviar tokens por correo electrónico',
+          message: result.message || 'Error sending tokens by email',
           data: result
         } as ApiResponse<TransactionResponse>);
         return;
@@ -123,15 +123,15 @@ export const walletController = {
       
       res.json({
         success: true,
-        message: `Se han enviado ${amount} ${tokenType || 'APT'} a ${toEmail}`,
+        message: `${amount} ${tokenType || 'APT'} have been sent to ${toEmail}`,
         data: result
       } as ApiResponse<TransactionResponse>);
     } catch (error: any) {
-      console.error('Error al enviar tokens por correo electrónico:', error);
+      console.error('Error sending tokens by email:', error);
       res.status(500).json({
         success: false,
-        message: error.message || 'Error al enviar tokens por correo electrónico'
+        message: error.message || 'Error sending tokens by email'
       } as ApiResponse);
     }
   }
-}; 
+};

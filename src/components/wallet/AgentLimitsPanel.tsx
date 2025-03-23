@@ -58,7 +58,7 @@ const AgentLimitsPanel: React.FC<AgentLimitsPanelProps> = ({ walletAddress }) =>
           });
         } else {
           console.error('Error al cargar límites:', error);
-          toast.error('No se pudieron cargar los límites del agente');
+          toast.error('Could not load agent limits');
         }
       } else if (data) {
         setLimits(data);
@@ -66,7 +66,7 @@ const AgentLimitsPanel: React.FC<AgentLimitsPanelProps> = ({ walletAddress }) =>
       }
     } catch (error) {
       console.error('Error inesperado:', error);
-      toast.error('Error al cargar configuración');
+      toast.error('Error loading configuration');
     } finally {
       setIsLoading(false);
     }
@@ -94,7 +94,7 @@ const AgentLimitsPanel: React.FC<AgentLimitsPanelProps> = ({ walletAddress }) =>
     }));
   };
 
-  // Guardar cambios
+  // Save changes
   const handleSave = async () => {
     try {
       const whitelist = formValues.whitelist_addresses
@@ -123,10 +123,10 @@ const AgentLimitsPanel: React.FC<AgentLimitsPanelProps> = ({ walletAddress }) =>
 
       setLimits(data);
       setIsEditing(false);
-      toast.success('Límites del agente actualizados');
+      toast.success('Agent limits updated');
     } catch (error) {
       console.error('Error al guardar límites:', error);
-      toast.error('Error al guardar los cambios');
+      toast.error('Error saving changes');
     }
   };
 
@@ -151,10 +151,10 @@ const AgentLimitsPanel: React.FC<AgentLimitsPanelProps> = ({ walletAddress }) =>
 
         setLimits(data);
         updateFormValues(data);
-        toast.success('Límites restablecidos a valores predeterminados');
+        toast.success('Limits reset to default values');
       } catch (error) {
         console.error('Error al restablecer límites:', error);
-        toast.error('Error al restablecer los valores');
+        toast.error('Error resetting values');
       }
     }
   };
@@ -175,13 +175,13 @@ const AgentLimitsPanel: React.FC<AgentLimitsPanelProps> = ({ walletAddress }) =>
   return (
     <div className="bg-white rounded-xl p-5 shadow-sm">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="font-medium text-gray-800">Límites del Agente</h3>
+        <h3 className="font-medium text-gray-800">Agent Limits</h3>
         {!isEditing ? (
           <button
             onClick={() => setIsEditing(true)}
             className="text-blue-600 hover:text-blue-800 text-sm font-medium"
           >
-            Editar
+            Edit
           </button>
         ) : (
           <div className="space-x-2">
@@ -189,13 +189,13 @@ const AgentLimitsPanel: React.FC<AgentLimitsPanelProps> = ({ walletAddress }) =>
               onClick={() => setIsEditing(false)}
               className="text-gray-500 hover:text-gray-700 text-sm font-medium"
             >
-              Cancelar
+              Cancel
             </button>
             <button
               onClick={handleSave}
               className="text-blue-600 hover:text-blue-800 text-sm font-medium"
             >
-              Guardar
+              Save
             </button>
           </div>
         )}
@@ -205,7 +205,7 @@ const AgentLimitsPanel: React.FC<AgentLimitsPanelProps> = ({ walletAddress }) =>
         <div className="space-y-4">
           <div>
             <label className="block text-sm text-gray-600 mb-1">
-              Máximo por transacción (tokens)
+              Maximum per transaction (tokens)
             </label>
             <input
               type="number"
@@ -219,7 +219,7 @@ const AgentLimitsPanel: React.FC<AgentLimitsPanelProps> = ({ walletAddress }) =>
           
           <div>
             <label className="block text-sm text-gray-600 mb-1">
-              Límite diario (tokens)
+              Daily limit (tokens)
             </label>
             <input
               type="number"
@@ -233,7 +233,7 @@ const AgentLimitsPanel: React.FC<AgentLimitsPanelProps> = ({ walletAddress }) =>
           
           <div>
             <label className="block text-sm text-gray-600 mb-1">
-              Transacciones máximas por día
+              Maximum transactions per day
             </label>
             <input
               type="number"
@@ -247,7 +247,7 @@ const AgentLimitsPanel: React.FC<AgentLimitsPanelProps> = ({ walletAddress }) =>
           
           <div>
             <label className="block text-sm text-gray-600 mb-1">
-              Límite mensual (tokens)
+              Monthly limit (tokens)
             </label>
             <input
               type="number"
@@ -261,7 +261,7 @@ const AgentLimitsPanel: React.FC<AgentLimitsPanelProps> = ({ walletAddress }) =>
           
           <div>
             <label className="block text-sm text-gray-600 mb-1">
-              Direcciones permitidas (una por línea)
+              Allowed addresses (one per line)
             </label>
             <textarea
               name="whitelist_addresses"
@@ -281,42 +281,42 @@ const AgentLimitsPanel: React.FC<AgentLimitsPanelProps> = ({ walletAddress }) =>
               onClick={handleReset}
               className="text-red-600 hover:text-red-800 text-sm font-medium"
             >
-              Restablecer valores predeterminados
+              Reset to default values
             </button>
           </div>
         </div>
       ) : (
         <div className="space-y-3">
           <div>
-            <p className="text-sm text-gray-500">Máximo por transacción</p>
+            <p className="text-sm text-gray-500">Maximum per transaction</p>
             <p className="font-medium text-gray-700">
               {limits?.max_tokens_per_tx} tokens
             </p>
           </div>
           
           <div>
-            <p className="text-sm text-gray-500">Límite diario</p>
+            <p className="text-sm text-gray-500">Daily limit</p>
             <p className="font-medium text-gray-700">
               {limits?.daily_tx_limit} tokens
             </p>
           </div>
           
           <div>
-            <p className="text-sm text-gray-500">Transacciones por día</p>
+            <p className="text-sm text-gray-500">Transactions per day</p>
             <p className="font-medium text-gray-700">
-              {limits?.max_tx_per_day} transacciones
+              {limits?.max_tx_per_day} transactions
             </p>
           </div>
           
           <div>
-            <p className="text-sm text-gray-500">Límite mensual</p>
+            <p className="text-sm text-gray-500">Monthly limit</p>
             <p className="font-medium text-gray-700">
               {limits?.monthly_tx_limit} tokens
             </p>
           </div>
           
           <div>
-            <p className="text-sm text-gray-500">Direcciones permitidas</p>
+            <p className="text-sm text-gray-500">Allowed addresses</p>
             {limits?.whitelist_addresses && limits.whitelist_addresses.length > 0 ? (
               <div className="max-h-24 overflow-y-auto text-xs">
                 {limits.whitelist_addresses.map((addr, i) => (
@@ -326,7 +326,7 @@ const AgentLimitsPanel: React.FC<AgentLimitsPanelProps> = ({ walletAddress }) =>
                 ))}
               </div>
             ) : (
-              <p className="font-medium text-gray-700">Todas las direcciones permitidas</p>
+              <p className="font-medium text-gray-700">All addresses allowed</p>
             )}
           </div>
         </div>
