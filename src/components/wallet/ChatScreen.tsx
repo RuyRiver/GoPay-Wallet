@@ -86,7 +86,7 @@ const BotMessage: React.FC<{ content: string }> = ({ content }) => {
         {transactionHash && (
           <div className="mt-2 text-xs overflow-hidden text-ellipsis">
             <a 
-              href={`https://explorer.aptoslabs.com/txn/${transactionHash}?network=testnet`}
+              href={`https://explorer.aptoslabs.com/txn/${transactionHash}?network=devnet`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-600 hover:underline"
