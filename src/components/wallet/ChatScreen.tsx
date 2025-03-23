@@ -304,7 +304,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onClose, walletAddress }) => {
           // Pantalla de bienvenida
           <div className="h-full flex flex-col items-center justify-center p-6">
             <img 
-              src="/logo/logo@HD.png" 
+              src="/logo/logo@vector.svg" 
               alt="GoPay" 
               className="w-24 h-24 mb-6" 
             />
@@ -369,7 +369,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onClose, walletAddress }) => {
                 <div className="flex gap-3 p-4">
                   <Avatar className="h-10 w-10">
                     <img 
-                      src="/logo/logo@favicon.png" 
+                      src="/logo/logo@vector.svg" 
                       alt="GoPay Bot" 
                       className="h-10 w-10 rounded-full"
                     />
