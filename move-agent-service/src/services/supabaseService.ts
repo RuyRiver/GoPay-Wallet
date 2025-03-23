@@ -390,15 +390,15 @@ export const userService = {
     try {
       console.log(`Buscando transacciones para la dirección: ${address}`);
       
-      // Consulta principal de transacciones
-      const { data, error } = await supabase
+      // Crear la consulta
+      let query = supabase
         .from('transactions')
         .select(`
           id,
           from_address,
           to_address,
           amount,
-          token,
+          token_type,
           status,
           created_at
         `)
@@ -407,9 +407,10 @@ export const userService = {
       
       // Aplicar límite si se especifica
       if (limit > 0) {
-        query.limit(limit);
+        query = query.limit(limit);
       }
       
+      // Ejecutar la consulta
       const { data, error } = await query;
       
       if (error) {
@@ -472,86 +473,31 @@ export const userService = {
     try {
       console.log(`Generando resumen de transacciones para: ${address} (límite: ${limit})`);
       
-      // Sanitizar la dirección para la consulta
-      const sanitizedAddress = address.trim();
+      // Obtener las transacciones utilizando la función getTransactionHistory
+      const transactions = await this.getTransactionHistory(address, limit);
       
-      // Consulta directa a la base de datos para obtener transacciones
-      const { data, error } = await supabase
-        .from('transactions')
-        .select(`
-          id,
-          from_address,
-          to_address,
-          amount,
-          token,
-          status,
-          created_at
-        `)
-        .or(`from_address.eq.${sanitizedAddress},to_address.eq.${sanitizedAddress}`)
-        .order('created_at', { ascending: false })
-        .limit(limit);
-      
-      if (error) {
-        console.error('Error al obtener transacciones:', error);
-        return [];
-      }
-      
-      if (!data || data.length === 0) {
+      if (!transactions || transactions.length === 0) {
         console.log('No se encontraron transacciones para esta dirección');
         return [];
       }
       
-      console.log(`Se encontraron ${data.length} transacciones para procesar`);
-      
-      // Obtener información de usuarios en paralelo para optimizar
-      const userEmails = new Map<string, { email?: string, name?: string }>();
-      
-      // Recolectar todas las direcciones únicas
-      const uniqueAddresses = [...new Set([
-        ...data.map(tx => tx.from_address).filter(Boolean),
-        ...data.map(tx => tx.to_address).filter(Boolean)
-      ])];
-      
-      // Consultar información de usuarios en masa
-      if (uniqueAddresses.length > 0) {
-        const { data: usersData, error: usersError } = await supabase
-          .from('users')
-          .select('address, email, name')
-          .in('address', uniqueAddresses);
-        
-        if (!usersError && usersData) {
-          // Almacenar datos de usuario por dirección
-          usersData.forEach(user => {
-            if (user.address) {
-              userEmails.set(user.address, { 
-                email: user.email, 
-                name: user.name 
-              });
-            }
-          });
-          
-          console.log(`Obtenida información para ${usersData.length} usuarios`);
-        } else {
-          console.error('Error al obtener información de usuarios:', usersError);
-        }
-      }
+      console.log(`Se encontraron ${transactions.length} transacciones para procesar`);
       
       // Formatear las transacciones para el resumen
-      return transactions.map(tx => {
+      const summary = transactions.map(tx => {
         const isOutgoing = tx.from_address === address;
         const counterpartyAddress = isOutgoing ? tx.to_address : tx.from_address;
         
         // Intentar obtener información de la contraparte
-        const counterpartyInfo = isOutgoing ? tx.to_users : tx.from_users;
-        const counterpartyName = counterpartyInfo && counterpartyInfo.length > 0
-          ? (counterpartyInfo[0].name || counterpartyInfo[0].email)
-          : null;
+        const counterpartyInfo = isOutgoing ? tx.to_user : tx.from_user;
+        const counterpartyEmail = counterpartyInfo ? counterpartyInfo.email : null;
+        const counterpartyName = counterpartyInfo ? (counterpartyInfo.name || counterpartyInfo.email) : null;
         
         return {
           id: tx.id,
           type: isOutgoing ? 'sent' : 'received',
           amount: tx.amount,
-          token: tx.token || 'APT',
+          token: tx.token_type || 'APT',
           counterparty: counterpartyName,
           counterpartyEmail: counterpartyEmail,
           counterpartyAddress: counterpartyAddress || 'Desconocido',
@@ -567,4 +513,4 @@ export const userService = {
       return [];
     }
   }
-};
+}; 
