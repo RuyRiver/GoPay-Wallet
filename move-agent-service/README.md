@@ -1,40 +1,54 @@
-# Move Agent Service
+# GoPay Move Agent Service
 
-Servicio API para interactuar con blockchains basadas en Move (Aptos) a través de instrucciones en lenguaje natural utilizando Move Agent Kit y Supabase para la resolución de correos electrónicos a direcciones blockchain.
+![GoPay Logo](https://lovable.dev/opengraph-image-p98pqg.png)
 
-## Características
+A powerful API service that enables the GoPay wallet to interact with Move-based blockchains (Aptos) using natural language instructions. This service leverages the Move Agent Toolkit and provides email-to-blockchain address resolution through Supabase.
 
-- API REST para comunicación con Move Agent Kit
-- Integración con OpenRouter para procesamiento de lenguaje natural
-- Soporte para operaciones en la blockchain Aptos
-- Resolución de correos electrónicos a direcciones blockchain mediante Supabase
-- Compatibilidad con tokens y NFTs
+## Features
 
-## Requisitos
+- **REST API** for seamless communication with Move Agent Toolkit
+- **Natural Language Processing** via OpenRouter for conversational interactions
+- **Blockchain Operations** supporting transactions on Aptos blockchain
+- **Email Resolution** to map email addresses to blockchain addresses
+- **Multi-asset Support** for tokens and NFTs
 
-- Node.js v18 o superior
-- Cuenta en OpenRouter para obtener clave API
-- Cuenta en Supabase para almacenamiento de usuarios
-- (Opcional) Cuenta en Aptos para realizar operaciones reales
+## Technologies
 
-## Instalación
+- **Node.js** and **TypeScript** for robust server-side code
+- **Express** for API routing and middleware
+- **Move Agent Toolkit** for simplified blockchain interactions
+- **OpenRouter** for AI processing of natural language inputs
+- **Supabase** for user data storage and authentication
+- **Aptos SDK** for blockchain transactions
 
-1. Clona este repositorio
-2. Instala las dependencias:
+## Requirements
+
+- Node.js v18 or higher
+- OpenRouter API key
+- Supabase account for user storage
+- (Optional) Aptos account for real blockchain operations
+
+## Installation
+
+1. Clone this repository
+2. Install dependencies:
 
 ```bash
 npm install
 ```
 
-3. Copia el archivo `.env.example` a `.env` y configura tus variables de entorno:
+3. Copy the `.env.example` file to `.env`:
 
 ```bash
 cp .env.example .env
 ```
 
-4. Edita el archivo `.env` con tu clave API de OpenRouter, URL de Supabase y clave de Supabase.
+4. Configure your environment variables in the `.env` file:
+   - OpenRouter API key
+   - Supabase URL and key
+   - Aptos network configuration
 
-5. Crea una tabla `users` en tu proyecto de Supabase con la siguiente estructura:
+5. Create a `users` table in your Supabase project with the following structure:
 
 ```sql
 CREATE TABLE users (
@@ -45,34 +59,34 @@ CREATE TABLE users (
 );
 ```
 
-## Uso
+## Usage
 
-### Desarrollo
+### Development
 
-Para iniciar el servidor en modo desarrollo:
+Start the server in development mode:
 
 ```bash
 npm run dev
 ```
 
-### Producción
+### Production
 
-Para compilar y ejecutar en producción:
+Build and run in production:
 
 ```bash
 npm run build
 npm start
 ```
 
-## Endpoints API
+## API Endpoints
 
-### Verificar estado
+### Status Check
 
 ```
 GET /api/status
 ```
 
-Respuesta:
+Response:
 ```json
 {
   "status": "ok",
@@ -82,58 +96,58 @@ Respuesta:
 }
 ```
 
-### Usuarios
+### User Management
 
-#### Registrar usuario
+#### Register User
 
 ```
 POST /api/users/register
 ```
 
-Cuerpo:
+Body:
 ```json
 {
-  "email": "usuario@ejemplo.com",
+  "email": "user@example.com",
   "address": "0x123..."
 }
 ```
 
-#### Resolver email a dirección
+#### Resolve Email to Address
 
 ```
 GET /api/users/resolve/:email
 ```
 
-Respuesta:
+Response:
 ```json
 {
   "success": true,
-  "message": "Dirección encontrada",
+  "message": "Address found",
   "data": {
     "address": "0x123..."
   }
 }
 ```
 
-#### Listar usuarios
+#### List Users
 
 ```
 GET /api/users
 ```
 
-### Wallet
+### Wallet Operations
 
-#### Obtener balance
+#### Get Balance
 
 ```
 GET /api/wallet/balance/:address
 ```
 
-Respuesta:
+Response:
 ```json
 {
   "success": true,
-  "message": "Balance obtenido correctamente",
+  "message": "Balance retrieved successfully",
   "data": {
     "APT": "10.5",
     "USDT": "100.0"
@@ -141,13 +155,13 @@ Respuesta:
 }
 ```
 
-#### Enviar tokens
+#### Send Tokens
 
 ```
 POST /api/wallet/send
 ```
 
-Cuerpo:
+Body:
 ```json
 {
   "fromAddress": "0x123...",
@@ -157,11 +171,11 @@ Cuerpo:
 }
 ```
 
-Respuesta:
+Response:
 ```json
 {
   "success": true,
-  "message": "Se han enviado 1.5 APT a 0x456...",
+  "message": "Successfully sent 1.5 APT to 0x456...",
   "data": {
     "txHash": "0xabc...",
     "status": "success"
@@ -169,46 +183,50 @@ Respuesta:
 }
 ```
 
-### Agente
+### Agent Processing
 
-#### Procesar instrucción en lenguaje natural
+#### Process Natural Language Instruction
 
 ```
 POST /api/agent/process
 ```
 
-Cuerpo:
+Body:
 ```json
 {
-  "message": "Envía 5 APT a usuario@ejemplo.com",
+  "message": "Send 5 APT to user@example.com",
   "address": "0x123..."
 }
 ```
 
-Respuesta:
+Response:
 ```json
 {
   "success": true,
-  "message": "He procesado tu solicitud para enviar tokens...",
+  "message": "I've processed your request to send tokens...",
   "data": {
     "response": {
-      "content": "He procesado tu solicitud para enviar tokens..."
+      "content": "I've processed your request to send tokens..."
     },
-    "processedMessage": "Envía 5 APT a 0x456...",
-    "originalMessage": "Envía 5 APT a usuario@ejemplo.com"
+    "processedMessage": "Send 5 APT to 0x456...",
+    "originalMessage": "Send 5 APT to user@example.com"
   }
 }
 ```
 
-## Despliegue
+## Deployment
 
-Este servicio puede ser desplegado en plataformas como:
+This service can be deployed on platforms such as:
 
-- Railway
-- Render
-- Fly.io
-- Vercel (funciones serverless)
+- [Railway](https://railway.app/)
+- [Vercel](https://vercel.com/) (serverless functions)
+- [Render](https://render.com/)
+- [Fly.io](https://fly.io/)
 
-## Licencia
+## Integration with GoPay Wallet
+
+The Move Agent Service works seamlessly with the GoPay Wallet frontend to provide a complete solution for blockchain interactions using natural language. The service handles the complex blockchain operations while exposing a simple API that the frontend can easily consume.
+
+## License
 
 ISC 

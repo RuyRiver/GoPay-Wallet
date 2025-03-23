@@ -1,10 +1,59 @@
-# Welcome to your Lovable project
+# GoPay - Web3 for Everyone
 
-## Project info
+![GoPay Logo](https://lovable.dev/opengraph-image-p98pqg.png)
 
-**URL**: https://lovable.dev/projects/344cdc19-71b3-40df-92f5-3ebdf96dc220
+## Simplifying Blockchain for the Masses
 
-## Environment Setup
+Imagine asking someone on the street to send you 100 USDT to your wallet. Would they know how? Most likely not. And if we tried to explain wallets, transaction signatures, gas fees, or seed phrases, how long would it take? Too long.
+
+**That's why we created GoPay** - a wallet designed for everyone, regardless of their blockchain knowledge. With GoPay, all you need to know is **how to sign in with your email and how to chat**. From your first moment, you can make blockchain transactions without complications.
+
+## How It Works
+
+- **Easy Registration**: Just your email and password. No seed phrases or complex configurations.
+- **Automatic Wallet**: The application generates a wallet for you and securely stores your private key.
+- **Intelligent Assistant**: Want to send funds, swap tokens, or check your balance? Just tell the assistant what you need, and it will handle everything.
+- **Hassle-free Funding**: You can fund your account with Wise, Skrill, credit card, debit card, and more.
+
+## Business Model
+
+GoPay charges a **1% commission** whenever you fund your account, make a transaction, or swap tokens. This ensures a smooth, secure service without complications.
+
+## Technologies
+
+GoPay is built with a modern tech stack focused on security, performance, and user experience:
+
+- **Frontend**:
+  - React with TypeScript
+  - Vite for fast building
+  - Tailwind CSS for styling
+  - shadcn-ui for beautiful UI components
+
+- **Authentication**:
+  - [Web3Auth](https://web3auth.io/) for seamless Web3 onboarding and secure key management
+
+- **Backend**:
+  - [Supabase](https://supabase.com/) for database and authentication support
+  - [Railway](https://railway.app/) for API deployment and hosting
+
+- **Blockchain**:
+  - [Move Agent Toolkit](https://github.com/aptos-labs/move-agent-toolkit) for simplified blockchain interactions
+  - Aptos blockchain for secure and efficient transactions
+
+- **AI & NLP**:
+  - [OpenRouter](https://openrouter.ai/) powering our intelligent assistant
+  - Natural language processing for conversational experience
+
+## Project Structure
+
+The project consists of two main components:
+
+1. **Main Web Application** - This repository contains the user interface and frontend logic
+2. **Move Agent Service** - A separate service that handles blockchain interactions through natural language processing
+
+## Getting Started
+
+### Environment Setup
 
 This project uses environment variables for configuration. Follow these steps to set up your environment:
 
@@ -13,7 +62,7 @@ This project uses environment variables for configuration. Follow these steps to
 3. Fill in your specific values for each variable:
    - **Supabase**: Set your Supabase URL and anonymous key
    - **Web3Auth**: Add your client ID and select the network (SAPPHIRE_DEVNET or SAPPHIRE_MAINNET)
-   - **Aptos**: The default values for testnet should work, but you can customize if needed
+   - **Aptos**: Configure blockchain network settings
    - **Verifier**: Set the verifier name for Web3Auth
 
 Example:
@@ -27,68 +76,18 @@ VITE_WEB3AUTH_CLIENT_ID=your_web3auth_client_id
 VITE_WEB3AUTH_NETWORK=SAPPHIRE_DEVNET
 ```
 
-> **Note:** Since this project uses Vite, environment variables need to be prefixed with `VITE_` to be accessible in the browser.
-
-## How can I edit this code?
-
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/344cdc19-71b3-40df-92f5-3ebdf96dc220) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+### Development
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Install dependencies
+npm install
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start the development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Our Vision
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+This project is designed for everyone, but especially for people with no blockchain experience who want to enter this world in the simplest way possible.
 
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with .
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/344cdc19-71b3-40df-92f5-3ebdf96dc220) and click on Share -> Publish.
-
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+**With GoPay, you just need your email and chat skills to start using blockchain. It's that simple. 🚀**
