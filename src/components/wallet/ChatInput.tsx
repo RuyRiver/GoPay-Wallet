@@ -23,7 +23,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, onInputClick, isLo
         className="bg-[rgba(248,248,248,1)] self-stretch flex items-center gap-2.5 flex-1 px-4 py-3 rounded-full shadow-sm border border-gray-200"
       >
         <img
-          src="/lovable-uploads/3992c85c-5a2a-4d3f-8961-b8b8f7f07838.png"
+          src="/logo/logo@vector.svg"
           className="aspect-[1] object-contain w-5 h-5 shrink-0"
           alt="Bot"
         />

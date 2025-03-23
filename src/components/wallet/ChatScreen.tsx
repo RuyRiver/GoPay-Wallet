@@ -82,7 +82,7 @@ const BotMessage: React.FC<{ content: string }> = ({ content }) => {
     <div className="flex gap-3 p-4">
       <Avatar className="h-10 w-10 self-start">
         <img 
-          src="/lovable-uploads/3992c85c-5a2a-4d3f-8961-b8b8f7f07838.png" 
+          src="/logo/logo@vector.svg" 
           alt="Bot" 
           className="h-10 w-10 rounded-full"
         />
