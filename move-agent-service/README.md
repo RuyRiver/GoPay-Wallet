@@ -1,6 +1,6 @@
 # GoPay Move Agent Service
 
-![GoPay Logo](https://lovable.dev/opengraph-image-p98pqg.png)
+<img src="https://github.com/RuyRiver/wallet-ui-lovable/blob/main/public/logo/logo@HD.png?raw=true" alt="GoPay Logo" width="250"/>
 
 A powerful API service that enables the GoPay wallet to interact with Move-based blockchains (Aptos) using natural language instructions. This service leverages the Move Agent Toolkit and provides email-to-blockchain address resolution through Supabase.
 

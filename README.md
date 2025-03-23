@@ -1,6 +1,6 @@
 # GoPay - Web3 for Everyone
 
-![GoPay Logo](https://lovable.dev/opengraph-image-p98pqg.png)
+<img src="https://github.com/RuyRiver/wallet-ui-lovable/blob/main/public/logo/logo@HD.png?raw=true" alt="GoPay Logo" width="250"/>
 
 ## Simplifying Blockchain for the Masses
 
