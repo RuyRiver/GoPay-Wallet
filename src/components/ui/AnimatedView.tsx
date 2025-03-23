@@ -53,7 +53,7 @@ const AnimatedView: React.FC<AnimatedViewProps> = ({
   
   return (
     <div 
-      className={`fixed inset-0 z-40 bg-gray-100/80 backdrop-blur-sm transition-all duration-500 ease-in-out ${
+      className={`fixed inset-0 z-40 bg-gray-100/80 backdrop-blur-sm transition-all duration-1000 ease-in-out ${
         show ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
       }`}
       style={{
@@ -64,7 +64,7 @@ const AnimatedView: React.FC<AnimatedViewProps> = ({
         className={`fixed inset-0 flex items-center justify-center overflow-hidden`}
       >
         <div 
-          className={`relative w-full max-w-md h-[85vh] bg-white flex flex-col overflow-hidden rounded-xl shadow-xl transition-all duration-500 ease-out transform ${
+          className={`relative w-full max-w-md h-[85vh] bg-white flex flex-col overflow-hidden rounded-xl shadow-xl transition-all duration-1000 ease-out transform ${
             show ? translateActiveClass : translateClass
           }`}
           style={{
@@ -80,4 +80,4 @@ const AnimatedView: React.FC<AnimatedViewProps> = ({
   );
 };
 
-export default AnimatedView; 
+export default AnimatedView;

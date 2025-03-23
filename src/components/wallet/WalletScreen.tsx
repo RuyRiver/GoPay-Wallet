@@ -81,7 +81,7 @@ const WalletScreen: React.FC = () => {
         setExitingView("");
         setCurrentView("main");
         setMainViewVisible(true);
-      }, 400);
+      }, 600); // Increased duration for smoother transition
     } else if (currentView !== "main") {
       // If there's already a different view than main, first hide it with animation
       setExitingView(currentView);
@@ -93,13 +93,13 @@ const WalletScreen: React.FC = () => {
         setExitingView("");
         setMainViewVisible(false);
         setCurrentView(view);
-      }, 500);
+      }, 1200); // Increased duration for smoother transition
     } else {
       // If we're in the main view, animate exit and show new view
       setMainViewVisible(false);
       setTimeout(() => {
         setCurrentView(view);
-      }, 300);
+      }, 900); // Increased duration for smoother transition
     }
   };
 
@@ -162,7 +162,7 @@ const WalletScreen: React.FC = () => {
 
       {/* Main view with animation */}
       {currentView === "main" && (
-        <div className={`relative z-10 flex flex-col items-center w-full h-full transition-all duration-500 transform ${mainViewVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+        <div className={`relative z-10 flex flex-col items-center w-full h-full transition-all duration-1000 transform ${mainViewVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           <Header 
             username={userInfo?.name || "User"} 
             balance={`$${totalUsdBalance}`}
