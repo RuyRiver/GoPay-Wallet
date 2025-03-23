@@ -169,7 +169,7 @@ const WalletScreen: React.FC = () => {
             onSettingsClick={() => handleActionButton("Settings")}
           />
 
-          <div className="bg-white border flex flex-1 w-full flex-col items-center p-3 rounded-t-[1.5rem] border-[rgba(237,237,237,1)] border-solid overflow-y-auto">
+          <div className="bg-white border flex flex-1 w-full flex-col items-center p-3 rounded-t-[1.5rem] border-[rgba(237,237,237,1)] border-solid overflow-y-auto mb-[50px]">
             <Tabs activeTab={activeTab} onTabChange={setActiveTab} />
 
             {activeTab === "tokens" ? (

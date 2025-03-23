@@ -49,6 +49,10 @@
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
+    
+    /* Safe area insets for mobile browsers */
+    --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+    --mobile-browser-bar-height: 80px; /* Fallback for browsers without env() support */
   }
 
   .dark {
@@ -97,6 +101,8 @@
 
   body {
     @apply bg-background text-foreground;
+    /* Ensure content is safe from browser UI elements */
+    padding-bottom: max(env(safe-area-inset-bottom, 0px), var(--mobile-browser-bar-height));
   }
 }
 
@@ -127,6 +133,43 @@
   height: calc(var(--vh, 1vh) * 85);
 }
 
+/* Safe area inset utilities */
+.pb-safe {
+  padding-bottom: var(--safe-area-inset-bottom, 0px);
+  padding-bottom: max(var(--safe-area-inset-bottom, 0px), var(--mobile-browser-bar-height));
+}
+
+.mb-safe {
+  margin-bottom: var(--safe-area-inset-bottom, 0px);
+  margin-bottom: max(var(--safe-area-inset-bottom, 0px), var(--mobile-browser-bar-height));
+}
+
+/* Compensate with negative margin if needed */
+.negative-mb-safe {
+  margin-bottom: calc(var(--safe-area-inset-bottom, 0px) * -1);
+  margin-bottom: calc(max(var(--safe-area-inset-bottom, 0px), var(--mobile-browser-bar-height)) * -1);
+}
+
+/* Bottom padding for mobile browsers to ensure content isn't covered by navigation bars */
+.pb-mobile-browser {
+  padding-bottom: var(--mobile-browser-bar-height);
+}
+
+/* Content container that adjusts height for mobile browser UI */
+.mobile-safe-content {
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), var(--mobile-browser-bar-height));
+  min-height: calc(100vh - max(env(safe-area-inset-bottom, 0px), var(--mobile-browser-bar-height)));
+  min-height: calc((var(--vh, 1vh) * 100) - max(env(safe-area-inset-bottom, 0px), var(--mobile-browser-bar-height)));
+}
+
+/* Sticky elements that need to stay above the browser UI */
+.sticky-safe-bottom {
+  position: sticky;
+  bottom: max(env(safe-area-inset-bottom, 0px), var(--mobile-browser-bar-height));
+  z-index: 40;
+  background-color: white;
+}
+
 /* Fix for mobile browsers with UI elements */
 html, body {
   overflow-x: hidden;
@@ -138,5 +181,17 @@ html, body {
 @supports (-webkit-touch-callout: none) {
   .h-screen, .min-h-screen, .max-h-screen {
     height: -webkit-fill-available;
+  }
+  
+  /* Add padding at the bottom to account for the browser's toolbar */
+  body {
+    padding-bottom: env(safe-area-inset-bottom, var(--mobile-browser-bar-height));
+  }
+}
+
+/* Fix for Chrome/Safari on iOS */
+@supports (padding: max(0px)) {
+  body {
+    padding-bottom: max(env(safe-area-inset-bottom, 0px), var(--mobile-browser-bar-height));
   }
 }
