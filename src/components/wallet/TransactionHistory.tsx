@@ -46,11 +46,10 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ address }) => {
   const formatTime = (timestamp: string) => {
     try {
       return formatDistanceToNow(new Date(timestamp), { 
-        addSuffix: true,
-        locale: es
+        addSuffix: true
       });
     } catch (e) {
-      return "fecha desconocida";
+      return "unknown date";
     }
   };
 
@@ -86,7 +85,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ address }) => {
     return (
       <div className="flex flex-col items-center justify-center h-full p-8">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
-        <p className="text-gray-500">Cargando transacciones...</p>
+        <p className="text-gray-500">Loading transactions...</p>
       </div>
     );
   }
@@ -125,7 +124,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ address }) => {
           <div className="flex-1 min-w-0">
             <div className="flex justify-between items-start">
               <h4 className="font-medium text-sm">
-                {isSender(tx) ? "Enviado" : "Recibido"}
+                {isSender(tx) ? "Sent" : "Received"}
               </h4>
               <span
                 className={`font-semibold text-sm ${
@@ -151,15 +150,15 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ address }) => {
           <div className="ml-2">
             {tx.status === "success" ? (
               <span className="text-xs px-2 py-1 bg-green-100 text-green-800 rounded-full">
-                Completado
+                Completed
               </span>
             ) : tx.status === "pending" ? (
               <span className="text-xs px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full">
-                Pendiente
+                Pending
               </span>
             ) : (
               <span className="text-xs px-2 py-1 bg-red-100 text-red-800 rounded-full">
-                Fallido
+                Failed
               </span>
             )}
           </div>

@@ -584,14 +584,14 @@ Responde en el mismo idioma que use el usuario (inglés o español). Detecta aut
           // Procesar el resultado
           if (txResult.status === 'success') {
             const txHash = txResult.txHash;
-            console.log(`Transacción exitosa. Hash: ${txHash}`);
+            console.log(`Transaction successful. Hash: ${txHash}`);
             
             // Mensaje de éxito personalizado según la moneda
             let successMessage = '';
             if (currency.toUpperCase() === 'USD') {
-              successMessage = `¡Transferencia exitosa! He enviado ${originalAmount.toFixed(2)} USD (equivalente a ${amountInApt.toFixed(4)} APT) a ${recipient}.`;
+              successMessage = `Transaction successful! I've sent ${originalAmount.toFixed(2)} USD (equivalent to ${amountInApt.toFixed(4)} APT) to ${recipient}.`;
             } else {
-              successMessage = `¡Transferencia exitosa! He enviado ${originalAmount} APT a ${recipient}.`;
+              successMessage = `Transaction successful! I've sent ${originalAmount} APT to ${recipient}.`;
             }
             
             return {

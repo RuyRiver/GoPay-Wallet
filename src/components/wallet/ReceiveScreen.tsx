@@ -96,12 +96,12 @@ const ReceiveScreen: React.FC<ReceiveScreenProps> = ({ onClose }) => {
             </div>
           ) : (
             <div className="w-56 h-56 flex items-center justify-center bg-gray-200 mb-6">
-              Generando código QR...
+              Generating QR code...
             </div>
           )}
 
           <div className="w-full text-center mb-4">
-            <p className="text-sm text-gray-500 mb-1">Tu dirección de la billetera</p>
+            <p className="text-sm text-gray-500 mb-1">Your wallet address</p>
             <p className="text-black font-medium">
               {formatAddress(aptosAddress)}
             </p>
@@ -129,7 +129,7 @@ const ReceiveScreen: React.FC<ReceiveScreenProps> = ({ onClose }) => {
             <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
           </svg>
-          {isCopied ? "¡Copiado!" : "Copiar dirección"}
+          {isCopied ? "Copied!" : "Copy address"}
         </button>
         
         <p className="text-center text-xs text-gray-500 mt-4">

@@ -22,7 +22,7 @@ export const agentController = {
       if (!message) {
         res.status(400).json({ 
           success: false, 
-          message: 'Se requiere un mensaje para procesar' 
+          message: 'A message is required to proceed' 
         } as ApiResponse);
         return;
       }
@@ -70,7 +70,7 @@ export const agentController = {
       console.error('Error al procesar la instrucción:', error);
       res.status(500).json({ 
         success: false, 
-        message: error.message || 'Error al procesar la instrucción' 
+        message: error.message || 'Error to process the instruction' 
       } as ApiResponse);
     }
   },
@@ -89,7 +89,7 @@ export const agentController = {
         res.status(400).json({ 
           success: false,
           error: 'Se requiere un mensaje',
-          message: 'No se proporcionó ningún mensaje para procesar'
+          message: 'None message provided'
         });
         return;
       }

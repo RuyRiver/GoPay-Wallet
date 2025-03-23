@@ -159,10 +159,10 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({ onBack, userInfo, walletAdd
             )}
 
             <div className="mt-6">
-              <h2 className="text-xl font-semibold mb-4">Configuración del Agente</h2>
+              <h2 className="text-xl font-semibold mb-4">Agent Configuration</h2>
               <AgentLimitsPanel walletAddress={walletAddress} />
               <p className="text-xs text-gray-500 mt-2">
-                Estos límites controlan lo que tu agente puede hacer con tus tokens
+                These limits control what your agent can do with your tokens
               </p>
             </div>
           </div>
@@ -617,4 +617,4 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onClose, onLogout }) =>
   );
 };
 
-export default SettingsScreen; 
+export default SettingsScreen;

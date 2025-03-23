@@ -7,7 +7,7 @@ import { ApiResponse, RegisterUserWithKeyRequest, User } from '../types';
 
 export const userController = {
   /**
-   * Registrar un nuevo usuario o actualizar uno existente
+   * Register a new user or update an existing one
    * @param req Request
    * @param res Response
    */
@@ -18,7 +18,7 @@ export const userController = {
       if (!email || !address) {
         res.status(400).json({
           success: false,
-          message: 'Se requiere email y address'
+          message: 'Email and address are required'
         } as ApiResponse);
         return;
       }
@@ -28,26 +28,26 @@ export const userController = {
       if (user) {
         res.json({
           success: true,
-          message: 'Usuario registrado correctamente',
+          message: 'User registered successfully',
           data: user
         } as ApiResponse<User>);
       } else {
         res.status(500).json({
           success: false,
-          message: 'Error al registrar usuario'
+          message: 'Error registering user'
         } as ApiResponse);
       }
     } catch (error) {
-      console.error('Error en registerUser:', error);
+      console.error('Error in registerUser:', error);
       res.status(500).json({
         success: false,
-        message: 'Error interno del servidor'
+        message: 'Internal server error'
       } as ApiResponse);
     }
   },
 
   /**
-   * Registrar un usuario con la mitad de su clave privada
+   * Register a user with half of their private key
    * @param req Request
    * @param res Response
    */
@@ -58,7 +58,7 @@ export const userController = {
       if (!email || !address || !privateKeyHalf) {
         res.status(400).json({
           success: false,
-          message: 'Se requiere email, address y privateKeyHalf'
+          message: 'Email, address and privateKeyHalf are required'
         } as ApiResponse);
         return;
       }
@@ -66,31 +66,31 @@ export const userController = {
       const user = await userService.registerUserWithKey(email, address, privateKeyHalf);
       
       if (user) {
-        // Por seguridad, no devolvemos la clave privada en la respuesta
+        // For security, we don't return the private key in the response
         const { private_key_half, ...safeUser } = user;
         
         res.json({
           success: true,
-          message: 'Usuario con clave registrado correctamente',
+          message: 'User with key registered successfully',
           data: safeUser
         } as ApiResponse<Omit<User, 'private_key_half'>>);
       } else {
         res.status(500).json({
           success: false,
-          message: 'Error al registrar usuario con clave'
+          message: 'Error registering user with key'
         } as ApiResponse);
       }
     } catch (error) {
-      console.error('Error en registerUserWithKey:', error);
+      console.error('Error in registerUserWithKey:', error);
       res.status(500).json({
         success: false,
-        message: 'Error interno del servidor'
+        message: 'Internal server error'
       } as ApiResponse);
     }
   },
   
   /**
-   * Resolver un email a una dirección blockchain
+   * Resolve an email to a blockchain address
    * @param req Request
    * @param res Response
    */
@@ -103,26 +103,26 @@ export const userController = {
       if (address) {
         res.json({
           success: true,
-          message: 'Dirección encontrada',
+          message: 'Address found',
           data: { address }
         } as ApiResponse<{ address: string }>);
       } else {
         res.status(404).json({
           success: false,
-          message: 'Usuario no encontrado'
+          message: 'User not found'
         } as ApiResponse);
       }
     } catch (error) {
-      console.error('Error en resolveAddress:', error);
+      console.error('Error in resolveAddress:', error);
       res.status(500).json({
         success: false,
-        message: 'Error interno del servidor'
+        message: 'Internal server error'
       } as ApiResponse);
     }
   },
   
   /**
-   * Obtener todos los usuarios
+   * Get all users
    * @param req Request
    * @param res Response
    */
@@ -130,7 +130,7 @@ export const userController = {
     try {
       const users = await userService.getAllUsers();
       
-      // Eliminar la información sensible antes de enviar
+      // Remove sensitive information before sending
       const safeUsers = users.map(user => {
         const { private_key_half, ...safeUser } = user;
         return safeUser;
@@ -138,20 +138,20 @@ export const userController = {
       
       res.json({
         success: true,
-        message: 'Usuarios obtenidos correctamente',
+        message: 'Users retrieved successfully',
         data: safeUsers
       } as ApiResponse<Omit<User, 'private_key_half'>[]>);
     } catch (error) {
-      console.error('Error en getAllUsers:', error);
+      console.error('Error in getAllUsers:', error);
       res.status(500).json({
         success: false,
-        message: 'Error interno del servidor'
+        message: 'Internal server error'
       } as ApiResponse);
     }
   },
 
   /**
-   * Verificar si un correo electrónico está registrado
+   * Verify if an email is registered
    * @param req Request
    * @param res Response
    */
@@ -162,7 +162,7 @@ export const userController = {
       if (!email) {
         res.status(400).json({
           success: false,
-          message: 'Se requiere un correo electrónico'
+          message: 'An email is required'
         } as ApiResponse);
         return;
       }
@@ -172,23 +172,23 @@ export const userController = {
       
       res.json({
         success: true,
-        message: exists ? 'El correo electrónico está registrado' : 'El correo electrónico no está registrado',
+        message: exists ? 'The email is registered' : 'The email is not registered',
         data: {
           exists,
           address
         }
       } as ApiResponse<{ exists: boolean, address: string | null }>);
     } catch (error: any) {
-      console.error('Error al verificar correo electrónico:', error);
+      console.error('Error verifying email:', error);
       res.status(500).json({
         success: false,
-        message: error.message || 'Error al verificar correo electrónico'
+        message: error.message || 'Error verifying email'
       } as ApiResponse);
     }
   },
 
   /**
-   * Obtener un resumen de las últimas transacciones del usuario
+   * Get a summary of the user's latest transactions
    * @param req Request
    * @param res Response
    */
@@ -200,7 +200,7 @@ export const userController = {
       if (!address) {
         res.status(400).json({
           success: false,
-          message: 'Se requiere la dirección de la wallet'
+          message: 'Wallet address is required'
         } as ApiResponse);
         return;
       }
@@ -209,17 +209,17 @@ export const userController = {
       
       res.json({
         success: true,
-        message: 'Resumen de transacciones obtenido correctamente',
+        message: 'Transaction summary retrieved successfully',
         data: {
           summary
         }
       } as ApiResponse<{ summary: any[] }>);
     } catch (error: any) {
-      console.error('Error al obtener resumen de transacciones:', error);
+      console.error('Error getting transaction summary:', error);
       res.status(500).json({
         success: false,
-        message: error.message || 'Error al obtener resumen de transacciones'
+        message: error.message || 'Error getting transaction summary'
       } as ApiResponse);
     }
   }
-}; 
+};

@@ -308,16 +308,16 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onClose, walletAddress }) => {
               alt="GoPay" 
               className="w-24 h-24 mb-6" 
             />
-            <h3 className="text-xl font-bold mb-4 text-center">¡Hola! Soy tu asistente financiero</h3>
+            <h3 className="text-xl font-bold mb-4 text-center">Hi! I'm your financial assistant</h3>
             <p className="text-gray-500 mb-8 text-center">
-              Puedo ayudarte a gestionar tus finanzas, realizar transacciones y responder tus preguntas sobre criptomonedas.
+              I can help you manage your finances, make transactions, and answer your questions about cryptocurrencies.
             </p>
             <Button 
               className="w-full max-w-xs" 
               onClick={handleContinue}
               disabled={isLoading}
             >
-              {isLoading ? "Configurando..." : "Empezar a Chatear"}
+              {isLoading ? "Configuring..." : "Start Chatting"}
             </Button>
           </div>
         ) : serviceStatus === 'offline' ? (
@@ -333,16 +333,16 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onClose, walletAddress }) => {
           // Sugerencias iniciales
           <div className="flex flex-col h-full">
             <ScrollArea className="flex-1 p-6">
-              <h3 className="text-lg font-semibold mb-6">¿En qué puedo ayudarte hoy?</h3>
+              <h3 className="text-lg font-semibold mb-6">How can I help you today?</h3>
               <ChatSuggestion 
-                title="Ver balance" 
-                description="Consulta el saldo de tu cuenta"
-                onClick={() => handleSuggestionClick("Muéstrame el balance de mi cuenta")}
+                title="View balance" 
+                description="Check your account balance"
+                onClick={() => handleSuggestionClick("Show me my account balance")}
               />
               <ChatSuggestion 
-                title="Enviar dinero" 
-                description="Transfiere fondos a otra cuenta"
-                onClick={() => handleSuggestionClick("Quiero enviar dinero a un amigo")}
+                title="Send money" 
+                description="Transfer funds to another account"
+                onClick={() => handleSuggestionClick("I want to send money to a friend")}
               />
               <ChatSuggestion 
                 title="Información" 

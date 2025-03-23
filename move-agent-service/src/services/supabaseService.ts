@@ -1,15 +1,15 @@
 /**
- * Servicio para interactuar con Supabase
+ * Service for interacting with Supabase
  */
 import { supabase } from '../config/supabase';
 import { User, AgentLimits, DEFAULT_AGENT_LIMITS, UpdateAgentLimitsRequest } from '../types';
 
 export const userService = {
   /**
-   * Registrar un nuevo usuario o actualizar uno existente
-   * @param email Email del usuario
-   * @param address Dirección blockchain del usuario
-   * @returns El usuario registrado o null si hubo un error
+   * Register a new user or update an existing one
+   * @param email User's email
+   * @param address User's blockchain address
+   * @returns The registered user or null if there was an error
    */
   async registerUser(email: string, address: string): Promise<User | null> {
     try {
@@ -23,23 +23,23 @@ export const userService = {
         .select();
       
       if (error) {
-        console.error('Error al registrar usuario:', error);
+        console.error('Error registering user:', error);
         return null;
       }
       
       return data?.[0] as User || null;
     } catch (error) {
-      console.error('Error inesperado al registrar usuario:', error);
+      console.error('Unexpected error registering user:', error);
       return null;
     }
   },
   
   /**
-   * Registrar un nuevo usuario con la mitad de su clave privada
-   * @param email Email del usuario
-   * @param address Dirección blockchain del usuario
-   * @param privateKeyHalf Mitad de la clave privada a almacenar
-   * @returns El usuario registrado o null si hubo un error
+   * Register a new user with half of their private key
+   * @param email User's email
+   * @param address User's blockchain address
+   * @param privateKeyHalf Half of the private key to store
+   * @returns The registered user or null if there was an error
    */
   async registerUserWithKey(email: string, address: string, privateKeyHalf: string): Promise<User | null> {
     try {
@@ -54,21 +54,21 @@ export const userService = {
         .select();
       
       if (error) {
-        console.error('Error al registrar usuario con clave:', error);
+        console.error('Error registering user with key:', error);
         return null;
       }
       
       return data?.[0] as User || null;
     } catch (error) {
-      console.error('Error inesperado al registrar usuario con clave:', error);
+      console.error('Unexpected error registering user with key:', error);
       return null;
     }
   },
   
   /**
-   * Resolver un email a una dirección blockchain
-   * @param email Email del usuario
-   * @returns La dirección blockchain o null si no se encontró
+   * Resolve an email to a blockchain address
+   * @param email User's email
+   * @returns The blockchain address or null if not found
    */
   async resolveAddress(email: string): Promise<string | null> {
     try {
@@ -79,21 +79,21 @@ export const userService = {
         .single();
       
       if (error || !data) {
-        console.error('Error al buscar dirección:', error);
+        console.error('Error looking up address:', error);
         return null;
       }
       
       return data.address;
     } catch (error) {
-      console.error('Error inesperado al resolver dirección:', error);
+      console.error('Unexpected error resolving address:', error);
       return null;
     }
   },
   
   /**
-   * Obtener la mitad de la clave privada almacenada para una dirección
-   * @param address Dirección blockchain
-   * @returns Mitad de la clave privada o null si no se encontró
+   * Get the stored half of the private key for an address
+   * @param address Blockchain address
+   * @returns Half of the private key or null if not found
    */
   async getPrivateKeyHalf(address: string): Promise<string | null> {
     try {
@@ -104,21 +104,21 @@ export const userService = {
         .single();
       
       if (error || !data || !data.private_key_half) {
-        console.error('Error al buscar mitad de clave privada:', error);
+        console.error('Error looking up private key half:', error);
         return null;
       }
       
       return data.private_key_half;
     } catch (error) {
-      console.error('Error inesperado al obtener mitad de clave privada:', error);
+      console.error('Unexpected error getting private key half:', error);
       return null;
     }
   },
   
   /**
-   * Comprobar si existe un usuario
-   * @param email Email del usuario
-   * @returns true si existe, false si no
+   * Check if a user exists
+   * @param email User's email
+   * @returns true if exists, false if not
    */
   async userExists(email: string): Promise<boolean> {
     try {
@@ -130,14 +130,14 @@ export const userService = {
       
       return !!data && !error;
     } catch (error) {
-      console.error('Error inesperado al comprobar usuario:', error);
+      console.error('Unexpected error checking user:', error);
       return false;
     }
   },
   
   /**
-   * Obtener todos los usuarios
-   * @returns Lista de usuarios o array vacío si hubo un error
+   * Get all users
+   * @returns List of users or empty array if there was an error
    */
   async getAllUsers(): Promise<User[]> {
     try {
@@ -146,21 +146,21 @@ export const userService = {
         .select('*');
       
       if (error) {
-        console.error('Error al obtener usuarios:', error);
+        console.error('Error getting users:', error);
         return [];
       }
       
       return data as User[] || [];
     } catch (error) {
-      console.error('Error inesperado al obtener usuarios:', error);
+      console.error('Unexpected error getting users:', error);
       return [];
     }
   },
   
   /**
-   * Obtener usuario por email
-   * @param email Email del usuario
-   * @returns Usuario encontrado o null
+   * Get user by email
+   * @param email User's email
+   * @returns Found user or null
    */
   async getUserByEmail(email: string): Promise<User | null> {
     try {
@@ -171,7 +171,7 @@ export const userService = {
         .single();
 
       if (error) {
-        console.error('Error al obtener usuario por email:', error);
+        console.error('Error getting user by email:', error);
         return null;
       }
 
@@ -183,9 +183,9 @@ export const userService = {
   },
   
   /**
-   * Obtener los límites del agente para un usuario
-   * @param address Dirección del usuario
-   * @returns Configuración de límites o null si no existe
+   * Get agent limits for a user
+   * @param address User's address
+   * @returns Limits configuration or null if it doesn't exist
    */
   async getAgentLimits(address: string): Promise<AgentLimits | null> {
     try {
@@ -196,11 +196,11 @@ export const userService = {
         .single();
       
       if (error) {
-        // Si el error es "no rows returned", significa que no hay configuración para este usuario
+        // If the error is "no rows returned", it means there's no configuration for this user
         if (error.code === 'PGRST116') {
           return null;
         }
-        console.error('Error al obtener límites del agente:', error);
+        console.error('Error getting agent limits:', error);
         return null;
       }
       
@@ -212,20 +212,20 @@ export const userService = {
   },
   
   /**
-   * Crear o actualizar los límites del agente para un usuario
-   * @param address Dirección del usuario
-   * @param limits Límites a establecer
-   * @returns Configuración actualizada o null si hubo un error
+   * Create or update agent limits for a user
+   * @param address User's address
+   * @param limits Limits to set
+   * @returns Updated configuration or null if there was an error
    */
   async updateAgentLimits(address: string, limits: UpdateAgentLimitsRequest): Promise<AgentLimits | null> {
     try {
-      // Obtener los límites actuales o aplicar los predeterminados
+      // Get current limits or apply defaults
       const currentLimits = await this.getAgentLimits(address) || {
         ...DEFAULT_AGENT_LIMITS,
         user_address: address
       };
       
-      // Aplicar las actualizaciones
+      // Apply updates
       const updatedLimits = {
         ...currentLimits,
         ...limits,
@@ -233,14 +233,14 @@ export const userService = {
         updated_at: new Date().toISOString()
       };
       
-      // Guardar en la base de datos
+      // Save to database
       const { data, error } = await supabase
         .from('agent_limits')
         .upsert(updatedLimits)
         .select();
       
       if (error) {
-        console.error('Error al actualizar límites del agente:', error);
+        console.error('Error updating agent limits:', error);
         return null;
       }
       
@@ -252,9 +252,9 @@ export const userService = {
   },
   
   /**
-   * Restablecer los límites del agente a los valores predeterminados
-   * @param address Dirección del usuario
-   * @returns Configuración actualizada o null si hubo un error
+   * Reset agent limits to default values
+   * @param address User's address
+   * @returns Updated configuration or null if there was an error
    */
   async resetAgentLimits(address: string): Promise<AgentLimits | null> {
     try {
@@ -270,7 +270,7 @@ export const userService = {
         .select();
       
       if (error) {
-        console.error('Error al restablecer límites del agente:', error);
+        console.error('Error resetting agent limits:', error);
         return null;
       }
       
@@ -282,40 +282,40 @@ export const userService = {
   },
   
   /**
-   * Verificar si una transacción está dentro de los límites permitidos
-   * @param address Dirección del usuario
-   * @param amount Cantidad a transferir
-   * @param toAddress Dirección de destino (opcional, para verificar lista blanca)
-   * @returns Objeto con resultado de verificación y mensaje
+   * Verify if a transaction is within allowed limits
+   * @param address User's address
+   * @param amount Amount to transfer
+   * @param toAddress Destination address (optional, to verify whitelist)
+   * @returns Object with verification result and message
    */
   async checkTransactionLimits(address: string, amount: number, toAddress?: string): Promise<{allowed: boolean, message: string}> {
     try {
-      // Obtener los límites del usuario o usar los predeterminados
+      // Get user limits or use defaults
       const limits = await this.getAgentLimits(address) || {
         ...DEFAULT_AGENT_LIMITS,
         user_address: address
       };
       
-      // Verificar límite por transacción
+      // Verify per-transaction limit
       if (amount > limits.max_tokens_per_tx) {
         return {
           allowed: false,
-          message: `La cantidad excede el límite máximo por transacción (${limits.max_tokens_per_tx})`
+          message: `The amount exceeds the maximum limit per transaction (${limits.max_tokens_per_tx})`
         };
       }
       
-      // Verificar lista blanca si está configurada y no está vacía
+      // Verify whitelist if configured and not empty
       if (limits.whitelist_addresses && 
           limits.whitelist_addresses.length > 0 && 
           toAddress && 
           !limits.whitelist_addresses.includes(toAddress)) {
         return {
           allowed: false,
-          message: `La dirección de destino no está en la lista blanca permitida`
+          message: `The destination address is not in the allowed whitelist`
         };
       }
       
-      // Verificar límite diario de transacciones
+      // Verify daily transaction limit
       const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
       
       const { data: todayTxs, error: txError } = await supabase
@@ -326,30 +326,30 @@ export const userService = {
         .lte('created_at', `${today}T23:59:59`);
       
       if (txError) {
-        console.error('Error al verificar transacciones diarias:', txError);
-        // En caso de error, permitimos la transacción para no bloquear al usuario
-        return { allowed: true, message: 'No se pudieron verificar los límites diarios' };
+        console.error('Error verifying daily transactions:', txError);
+        // In case of error, we allow the transaction to avoid blocking the user
+        return { allowed: true, message: 'Could not verify daily limits' };
       }
       
-      // Verificar número de transacciones diarias
+      // Verify number of daily transactions
       if (todayTxs.length >= limits.max_tx_per_day) {
         return {
           allowed: false,
-          message: `Has alcanzado el número máximo de transacciones diarias (${limits.max_tx_per_day})`
+          message: `You have reached the maximum number of daily transactions (${limits.max_tx_per_day})`
         };
       }
       
-      // Calcular total enviado hoy
+      // Calculate total sent today
       const todayTotal = todayTxs.reduce((sum, tx) => sum + Number(tx.amount), 0);
       
       if (todayTotal + amount > limits.daily_tx_limit) {
         return {
           allowed: false,
-          message: `La transacción excede tu límite diario restante (${limits.daily_tx_limit - todayTotal})`
+          message: `The transaction exceeds your remaining daily limit (${limits.daily_tx_limit - todayTotal})`
         };
       }
       
-      // Verificar límite mensual
+      // Verify monthly limit
       const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
       
       const { data: monthTxs, error: monthError } = await supabase
@@ -359,8 +359,8 @@ export const userService = {
         .ilike('created_at', `${currentMonth}%`);
       
       if (monthError) {
-        console.error('Error al verificar transacciones mensuales:', monthError);
-        return { allowed: true, message: 'No se pudieron verificar los límites mensuales' };
+        console.error('Error verifying monthly transactions:', monthError);
+        return { allowed: true, message: 'Could not verify monthly limits' };
       }
       
       const monthTotal = monthTxs.reduce((sum, tx) => sum + Number(tx.amount), 0);
@@ -368,23 +368,23 @@ export const userService = {
       if (monthTotal + amount > limits.monthly_tx_limit) {
         return {
           allowed: false,
-          message: `La transacción excede tu límite mensual restante (${limits.monthly_tx_limit - monthTotal})`
+          message: `The transaction exceeds your remaining monthly limit (${limits.monthly_tx_limit - monthTotal})`
         };
       }
       
-      return { allowed: true, message: 'Transacción dentro de los límites permitidos' };
+      return { allowed: true, message: 'Transaction within allowed limits' };
     } catch (error) {
-      console.error('Error en checkTransactionLimits:', error);
-      // En caso de error, permitimos la transacción para no bloquear al usuario
-      return { allowed: true, message: 'Error al verificar límites, transacción permitida' };
+      console.error('Error in checkTransactionLimits:', error);
+      // In case of error, we allow the transaction to avoid blocking the user
+      return { allowed: true, message: 'Error verifying limits, transaction allowed' };
     }
   },
 
   /**
-   * Obtener el historial de transacciones para una dirección
-   * @param address Dirección del usuario
-   * @param limit Número máximo de transacciones a devolver (opcional)
-   * @returns Lista de transacciones o array vacío si hubo error
+   * Get transaction history for an address
+   * @param address User's address
+   * @param limit Maximum number of transactions to return (optional)
+   * @returns List of transactions or empty array if there was an error
    */
   async getTransactionHistory(address: string, limit: number = 10): Promise<any[]> {
     try {
@@ -403,11 +403,17 @@ export const userService = {
           created_at
         `)
         .or(`from_address.eq.${address},to_address.eq.${address}`)
-        .order('created_at', { ascending: false })
-        .limit(limit);
+        .order('created_at', { ascending: false });
+      
+      // Aplicar límite si se especifica
+      if (limit > 0) {
+        query.limit(limit);
+      }
+      
+      const { data, error } = await query;
       
       if (error) {
-        console.error('Error al obtener historial de transacciones:', error);
+        console.error('Error getting transaction history:', error);
         return [];
       }
       
@@ -451,16 +457,16 @@ export const userService = {
       
       return transactions;
     } catch (error) {
-      console.error('Error inesperado al obtener historial de transacciones:', error);
+      console.error('Unexpected error getting transaction history:', error);
       return [];
     }
   },
   
   /**
-   * Obtener un resumen de las últimas transacciones de un usuario
-   * @param address Dirección del usuario
-   * @param limit Número máximo de transacciones a incluir en el resumen (opcional)
-   * @returns Resumen formateado de transacciones
+   * Get a summary of the latest transactions of a user
+   * @param address User's address
+   * @param limit Maximum number of transactions to include in the summary (optional)
+   * @returns Formatted transaction summary
    */
   async getTransactionSummary(address: string, limit: number = 5): Promise<any[]> {
     try {
@@ -531,34 +537,19 @@ export const userService = {
       }
       
       // Formatear las transacciones para el resumen
-      const summary = data.map(tx => {
-        const isOutgoing = tx.from_address === sanitizedAddress;
-        
-        // Determinar la contraparte basada en si es saliente o entrante
+      return transactions.map(tx => {
+        const isOutgoing = tx.from_address === address;
         const counterpartyAddress = isOutgoing ? tx.to_address : tx.from_address;
         
-        // Obtener información del usuario contraparte
-        const counterpartyInfo = userEmails.get(counterpartyAddress || '');
-        
-        // Determinar el nombre o la dirección de la contraparte
-        let counterpartyName = counterpartyAddress || 'Desconocido';
-        let counterpartyEmail = 'Desconocido';
-        
-        if (counterpartyInfo) {
-          if (counterpartyInfo.name) {
-            counterpartyName = counterpartyInfo.name;
-          } else if (counterpartyInfo.email) {
-            counterpartyName = counterpartyInfo.email;
-          }
-          
-          counterpartyEmail = counterpartyInfo.email || 'Desconocido';
-        }
-        
-        console.log(`Procesando transacción ${tx.id}: ${isOutgoing ? 'enviada a' : 'recibida de'} ${counterpartyName}`);
+        // Intentar obtener información de la contraparte
+        const counterpartyInfo = isOutgoing ? tx.to_users : tx.from_users;
+        const counterpartyName = counterpartyInfo && counterpartyInfo.length > 0
+          ? (counterpartyInfo[0].name || counterpartyInfo[0].email)
+          : null;
         
         return {
           id: tx.id,
-          type: isOutgoing ? 'enviada' : 'recibida',
+          type: isOutgoing ? 'sent' : 'received',
           amount: tx.amount,
           token: tx.token || 'APT',
           counterparty: counterpartyName,
@@ -572,8 +563,8 @@ export const userService = {
       console.log(`Resumen de transacciones generado: ${summary.length} transacciones`);
       return summary;
     } catch (error) {
-      console.error('Error inesperado al generar resumen de transacciones:', error);
+      console.error('Error al generar resumen de transacciones:', error);
       return [];
     }
   }
-}; 
+};
