@@ -147,9 +147,22 @@ const WalletScreen: React.FC = () => {
 
   return (
     <div className="bg-gray-50 flex flex-col h-screen w-full overflow-hidden fixed inset-0">
+      {/* Video Background */}
+      <div className="absolute inset-0 overflow-hidden z-0">
+        <video 
+          autoPlay 
+          loop 
+          muted 
+          playsInline
+          className="w-full h-full object-cover"
+        >
+          <source src="/bg/header-bg.webm" type="video/webm" />
+        </video>
+      </div>
+
       {/* Main view with animation */}
       {currentView === "main" && (
-        <div className={`flex flex-col items-center w-full h-full transition-all duration-500 transform ${mainViewVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+        <div className={`relative z-10 flex flex-col items-center w-full h-full transition-all duration-500 transform ${mainViewVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           <Header 
             username={userInfo?.name || "User"} 
             balance={`$${totalUsdBalance}`}

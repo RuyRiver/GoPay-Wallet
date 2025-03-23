@@ -14,14 +14,7 @@ const Header: React.FC<HeaderProps> = ({
   onSettingsClick
 }) => {
   return <div className="flex flex-col w-full self-stretch text-center relative pb-4">
-      <div className="absolute inset-0 overflow-hidden z-0 flex items-center justify-center">
-        <img 
-          src="/assets/gg_shape_01_1.webp" 
-          className="max-w-full max-h-[450px] object-contain" 
-          alt="Background" 
-        />
-      </div>
-      <div className="relative z-10 self-stretch flex w-full items-center text-2xl text-black font-bold whitespace-nowrap justify-between px-5 py-3">
+      <div className="relative z-10 self-stretch flex w-full items-center text-xl text-white font-regular whitespace-nowrap justify-between px-5 py-3">
         <Button 
           variant="ghost" 
           size="icon" 
@@ -37,8 +30,8 @@ const Header: React.FC<HeaderProps> = ({
         </Button>
       </div>
       <div className="relative z-10 py-12 self-stretch flex flex-col justify-center items-center text-white tracking-[0.2px]">
-        <div className="text-sm font-medium">Total Balance</div>
-        <div className="text-3xl font-bold whitespace-nowrap mt-1">
+        <div className="text-xl font-medium">Total Balance</div>
+        <div className="text-5xl font-bold whitespace-nowrap mt-1">
           {balance}
         </div>
       </div>
