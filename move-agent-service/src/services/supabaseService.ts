@@ -388,7 +388,10 @@ export const userService = {
    */
   async getTransactionHistory(address: string, limit: number = 10): Promise<any[]> {
     try {
-      const query = supabase
+      console.log(`Buscando transacciones para la dirección: ${address}`);
+      
+      // Consulta principal de transacciones
+      const { data, error } = await supabase
         .from('transactions')
         .select(`
           id,
@@ -397,14 +400,12 @@ export const userService = {
           amount,
           token,
           status,
-          created_at,
-          from_users:users!from_address(email, name),
-          to_users:users!to_address(email, name)
+          created_at
         `)
         .or(`from_address.eq.${address},to_address.eq.${address}`)
         .order('created_at', { ascending: false });
       
-      // Apply limit if specified
+      // Aplicar límite si se especifica
       if (limit > 0) {
         query.limit(limit);
       }
@@ -416,7 +417,45 @@ export const userService = {
         return [];
       }
       
-      return data || [];
+      if (!data || data.length === 0) {
+        console.log('No se encontraron transacciones para esta dirección');
+        return [];
+      }
+      
+      console.log(`Se encontraron ${data.length} transacciones`);
+      
+      // Enriquecer los datos con información de usuario
+      const transactions = await Promise.all(data.map(async (tx) => {
+        // Obtener información del remitente
+        let fromUserInfo = null;
+        if (tx.from_address) {
+          const { data: fromData } = await supabase
+            .from('users')
+            .select('email, name')
+            .eq('address', tx.from_address)
+            .single();
+          fromUserInfo = fromData;
+        }
+        
+        // Obtener información del destinatario
+        let toUserInfo = null;
+        if (tx.to_address) {
+          const { data: toData } = await supabase
+            .from('users')
+            .select('email, name')
+            .eq('address', tx.to_address)
+            .single();
+          toUserInfo = toData;
+        }
+        
+        return {
+          ...tx,
+          from_user: fromUserInfo,
+          to_user: toUserInfo
+        };
+      }));
+      
+      return transactions;
     } catch (error) {
       console.error('Unexpected error getting transaction history:', error);
       return [];
@@ -431,14 +470,78 @@ export const userService = {
    */
   async getTransactionSummary(address: string, limit: number = 5): Promise<any[]> {
     try {
-      const transactions = await this.getTransactionHistory(address, limit);
+      console.log(`Generando resumen de transacciones para: ${address} (límite: ${limit})`);
       
-      // Format transactions for the summary
+      // Sanitizar la dirección para la consulta
+      const sanitizedAddress = address.trim();
+      
+      // Consulta directa a la base de datos para obtener transacciones
+      const { data, error } = await supabase
+        .from('transactions')
+        .select(`
+          id,
+          from_address,
+          to_address,
+          amount,
+          token,
+          status,
+          created_at
+        `)
+        .or(`from_address.eq.${sanitizedAddress},to_address.eq.${sanitizedAddress}`)
+        .order('created_at', { ascending: false })
+        .limit(limit);
+      
+      if (error) {
+        console.error('Error al obtener transacciones:', error);
+        return [];
+      }
+      
+      if (!data || data.length === 0) {
+        console.log('No se encontraron transacciones para esta dirección');
+        return [];
+      }
+      
+      console.log(`Se encontraron ${data.length} transacciones para procesar`);
+      
+      // Obtener información de usuarios en paralelo para optimizar
+      const userEmails = new Map<string, { email?: string, name?: string }>();
+      
+      // Recolectar todas las direcciones únicas
+      const uniqueAddresses = [...new Set([
+        ...data.map(tx => tx.from_address).filter(Boolean),
+        ...data.map(tx => tx.to_address).filter(Boolean)
+      ])];
+      
+      // Consultar información de usuarios en masa
+      if (uniqueAddresses.length > 0) {
+        const { data: usersData, error: usersError } = await supabase
+          .from('users')
+          .select('address, email, name')
+          .in('address', uniqueAddresses);
+        
+        if (!usersError && usersData) {
+          // Almacenar datos de usuario por dirección
+          usersData.forEach(user => {
+            if (user.address) {
+              userEmails.set(user.address, { 
+                email: user.email, 
+                name: user.name 
+              });
+            }
+          });
+          
+          console.log(`Obtenida información para ${usersData.length} usuarios`);
+        } else {
+          console.error('Error al obtener información de usuarios:', usersError);
+        }
+      }
+      
+      // Formatear las transacciones para el resumen
       return transactions.map(tx => {
         const isOutgoing = tx.from_address === address;
         const counterpartyAddress = isOutgoing ? tx.to_address : tx.from_address;
         
-        // Try to get counterparty information
+        // Intentar obtener información de la contraparte
         const counterpartyInfo = isOutgoing ? tx.to_users : tx.from_users;
         const counterpartyName = counterpartyInfo && counterpartyInfo.length > 0
           ? (counterpartyInfo[0].name || counterpartyInfo[0].email)
@@ -448,14 +551,19 @@ export const userService = {
           id: tx.id,
           type: isOutgoing ? 'sent' : 'received',
           amount: tx.amount,
-          token: tx.token,
-          counterparty: counterpartyName || counterpartyAddress,
+          token: tx.token || 'APT',
+          counterparty: counterpartyName,
+          counterpartyEmail: counterpartyEmail,
+          counterpartyAddress: counterpartyAddress || 'Desconocido',
           date: new Date(tx.created_at).toLocaleDateString(),
-          status: tx.status
+          status: tx.status || 'completada'
         };
       });
+      
+      console.log(`Resumen de transacciones generado: ${summary.length} transacciones`);
+      return summary;
     } catch (error) {
-      console.error('Error generating transaction summary:', error);
+      console.error('Error al generar resumen de transacciones:', error);
       return [];
     }
   }
