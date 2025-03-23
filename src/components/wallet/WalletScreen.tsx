@@ -81,7 +81,7 @@ const WalletScreen: React.FC = () => {
         setExitingView("");
         setCurrentView("main");
         setMainViewVisible(true);
-      }, 600); // Increased duration for smoother transition
+      }, 20); // Increased duration for smoother transition
     } else if (currentView !== "main") {
       // If there's already a different view than main, first hide it with animation
       setExitingView(currentView);
@@ -99,7 +99,7 @@ const WalletScreen: React.FC = () => {
       setMainViewVisible(false);
       setTimeout(() => {
         setCurrentView(view);
-      }, 900); // Increased duration for smoother transition
+      }, 20); // Increased duration for smoother transition
     }
   };
 

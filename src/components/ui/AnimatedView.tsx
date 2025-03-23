@@ -29,7 +29,7 @@ const AnimatedView: React.FC<AnimatedViewProps> = ({
     if (!show && mounted) {
       const timer = setTimeout(() => {
         setMounted(false);
-      }, 500); // 500ms es la duración de la transición
+      }, 700); // Increased to 700ms to match the new animation duration
       return () => clearTimeout(timer);
     }
   }, [show, mounted]);
@@ -53,8 +53,8 @@ const AnimatedView: React.FC<AnimatedViewProps> = ({
   
   return (
     <div 
-      className={`fixed inset-0 z-40 bg-gray-100/80 backdrop-blur-sm transition-all duration-1000 ease-in-out ${
-        show ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+      className={`fixed inset-0 z-40 bg-gray-100/80 backdrop-blur-sm transition-all duration-700 ease-out ${
+        show ? "opacity-100 pointer-events-auto animate-fade-in-up" : "opacity-0 pointer-events-none animate-fade-out-down"
       }`}
       style={{
         perspective: '1000px',
@@ -64,13 +64,12 @@ const AnimatedView: React.FC<AnimatedViewProps> = ({
         className={`fixed inset-0 flex items-center justify-center overflow-hidden`}
       >
         <div 
-          className={`relative w-full max-w-md h-[85vh] bg-white flex flex-col overflow-hidden rounded-xl shadow-xl transition-all duration-1000 ease-out transform ${
-            show ? translateActiveClass : translateClass
-          }`}
+          className={`relative w-full max-w-md h-[85vh] bg-white flex flex-col overflow-hidden rounded-xl shadow-xl transition-all duration-700 ease-out transform ${show ? `${translateActiveClass} animate-spring-in-${direction}` : `${translateClass} animate-spring-out-${direction}`}`}
           style={{
             transformStyle: 'preserve-3d',
             backfaceVisibility: 'hidden',
             boxShadow: show ? '0 25px 50px -12px rgba(0, 0, 0, 0.25)' : '0 0 0 rgba(0, 0, 0, 0)',
+            animation: show ? 'pulse-shadow 2s ease-in-out infinite' : 'none'
           }}
         >
           {children}

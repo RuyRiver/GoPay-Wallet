@@ -196,8 +196,8 @@ module.exports = {
       animation: {
         "accordion-down": "accordion-down 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
         "accordion-up": "accordion-up 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
-        fadeIn: 'fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-        slideUp: 'slideUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+        "fadeIn": 'fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        "slideUp": 'slideUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
         'fade-in-up': 'fade-in-up 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
         'content-enter': 'content-enter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
         'floating': 'floating 3s ease-in-out infinite',
