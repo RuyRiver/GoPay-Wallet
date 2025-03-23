@@ -9,10 +9,16 @@ const router = Router();
 // Registrar un usuario
 router.post('/register', userController.registerUser);
 
+// Registrar un usuario con mitad de la clave privada
+router.post('/register-with-key', userController.registerUserWithKey);
+
 // Resolver email a dirección
 router.get('/resolve/:email', userController.resolveAddress);
 
 // Obtener todos los usuarios
 router.get('/', userController.getAllUsers);
+
+// Verificar si un correo electrónico está registrado
+router.get('/check-email/:email', userController.checkEmailExists);
 
 export default router; 

@@ -1,0 +1,10 @@
+[package]
+name = "FaucetToken"
+version = "0.0.1"
+authors = ["Lovable Wallet"]
+
+[addresses]
+FaucetToken = "0b5c0fccecc6a01516233b2c18312c7ac60dcb7d874639816e6d5d95961853b0"
+
+[dependencies]
+AptosFramework = { git = "https://github.com/aptos-labs/aptos-core.git", subdir = "aptos-move/framework/aptos-framework/", rev = "mainnet" } 

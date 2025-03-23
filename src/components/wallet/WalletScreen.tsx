@@ -206,7 +206,7 @@ const WalletScreen: React.FC = () => {
       </AnimatedView>
       
       <AnimatedView show={isViewActive("chat")} direction="right">
-        <ChatScreen onClose={() => handleShowView("main")} />
+        <ChatScreen onClose={() => handleShowView("main")} walletAddress={aptosAddress} />
       </AnimatedView>
     </div>
   );

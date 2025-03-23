@@ -19,6 +19,8 @@ export const moveAgentConfig = {
   baseUrl: getAgentServiceUrl(),
   endpoints: {
     process: '/api/agent/process',
+    'process-message': '/api/agent/process-message',
+    'register-with-key': '/api/user/register-with-key',
     status: '/api/status'
   },
   timeout: 30000 // Timeout en milisegundos

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useWeb3Auth } from "@/context/Web3AuthContext";
 import { getUserByEmail } from "@/utils/supabase";
 import AnimatedView from "@/components/ui/AnimatedView";
+import AgentLimitsPanel from './AgentLimitsPanel';
 
 interface SettingsScreenProps {
   onClose: () => void;
@@ -156,6 +157,14 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({ onBack, userInfo, walletAdd
                 </div>
               </div>
             )}
+
+            <div className="mt-6">
+              <h2 className="text-xl font-semibold mb-4">Configuración del Agente</h2>
+              <AgentLimitsPanel walletAddress={walletAddress} />
+              <p className="text-xs text-gray-500 mt-2">
+                Estos límites controlan lo que tu agente puede hacer con tus tokens
+              </p>
+            </div>
           </div>
         )}
       </div>

@@ -3,7 +3,7 @@
  */
 import { Request, Response } from 'express';
 import { moveAgentService } from '../services/moveAgentService';
-import { ApiResponse, BalanceResponse, SendTokenRequest, TransactionResponse } from '../types';
+import { ApiResponse, BalanceResponse, SendTokenRequest, SendTokenByEmailRequest, TransactionResponse } from '../types';
 
 export const walletController = {
   /**
@@ -46,7 +46,7 @@ export const walletController = {
    */
   async sendTokens(req: Request, res: Response): Promise<void> {
     try {
-      const { fromAddress, toAddress, amount, tokenType } = req.body as SendTokenRequest;
+      const { fromAddress, toAddress, amount, tokenType, privateKeyHalf } = req.body as SendTokenRequest;
       
       if (!fromAddress || !toAddress || amount === undefined) {
         res.status(400).json({
@@ -60,8 +60,18 @@ export const walletController = {
         fromAddress, 
         toAddress, 
         amount, 
-        tokenType
+        tokenType,
+        privateKeyHalf
       );
+      
+      if (result.status === 'error') {
+        res.status(400).json({
+          success: false,
+          message: result.message || 'Error al enviar tokens',
+          data: result
+        } as ApiResponse<TransactionResponse>);
+        return;
+      }
       
       res.json({
         success: true,
@@ -73,6 +83,54 @@ export const walletController = {
       res.status(500).json({
         success: false,
         message: error.message || 'Error al enviar tokens'
+      } as ApiResponse);
+    }
+  },
+  
+  /**
+   * Enviar tokens usando correo electrónico como destinatario
+   * @param req Request
+   * @param res Response
+   */
+  async sendTokensByEmail(req: Request, res: Response): Promise<void> {
+    try {
+      const { fromAddress, toEmail, amount, tokenType, privateKeyHalf } = req.body as SendTokenByEmailRequest;
+      
+      if (!fromAddress || !toEmail || amount === undefined) {
+        res.status(400).json({
+          success: false,
+          message: 'Se requieren fromAddress, toEmail y amount'
+        } as ApiResponse);
+        return;
+      }
+      
+      const result = await moveAgentService.sendTokensByEmail(
+        fromAddress, 
+        toEmail, 
+        amount, 
+        tokenType,
+        privateKeyHalf
+      );
+      
+      if (result.status === 'error') {
+        res.status(400).json({
+          success: false,
+          message: result.message || 'Error al enviar tokens por correo electrónico',
+          data: result
+        } as ApiResponse<TransactionResponse>);
+        return;
+      }
+      
+      res.json({
+        success: true,
+        message: `Se han enviado ${amount} ${tokenType || 'APT'} a ${toEmail}`,
+        data: result
+      } as ApiResponse<TransactionResponse>);
+    } catch (error: any) {
+      console.error('Error al enviar tokens por correo electrónico:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Error al enviar tokens por correo electrónico'
       } as ApiResponse);
     }
   }

@@ -20,6 +20,7 @@ export interface AgentResponse {
 export interface AgentRequest {
   message: string;
   address?: string;
+  privateKeyHalf?: string;
 }
 
 // Servicio para comunicarse con el Move Agent
@@ -28,16 +29,17 @@ const moveAgentService = {
    * Procesar un mensaje a través del agent
    * @param message Mensaje a procesar
    * @param address Dirección de wallet opcional
+   * @param privateKeyHalf Mitad de la clave privada opcional
    * @returns Respuesta del agente
    */
-  async processMessage(message: string, address?: string): Promise<AgentResponse> {
+  async processMessage(message: string, address?: string, privateKeyHalf?: string): Promise<AgentResponse> {
     try {
-      const response = await fetch(getEndpointUrl('process'), {
+      const response = await fetch(getEndpointUrl('process-message'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message, address }),
+        body: JSON.stringify({ message, address, privateKeyHalf }),
         // Configurar timeout
         signal: AbortSignal.timeout(moveAgentConfig.timeout)
       });
@@ -81,6 +83,38 @@ const moveAgentService = {
         status: 'error',
         message: 'No se pudo conectar con el servicio',
         version: 'desconocida'
+      };
+    }
+  },
+
+  /**
+   * Registrar la mitad de la clave privada para un usuario
+   * @param email Email del usuario
+   * @param address Dirección de la wallet
+   * @param privateKeyHalf Mitad de la clave privada para almacenar
+   * @returns Respuesta del servicio
+   */
+  async registerWithKey(email: string, address: string, privateKeyHalf: string): Promise<{success: boolean; message: string}> {
+    try {
+      const response = await fetch(getEndpointUrl('register-with-key'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, address, privateKeyHalf }),
+        signal: AbortSignal.timeout(moveAgentConfig.timeout)
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error al registrar usuario con mitad de clave:', error);
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Error desconocido al registrar clave'
       };
     }
   }

@@ -1,21 +1,35 @@
 import React, { useState, useEffect } from "react";
 import { useWeb3Auth } from "@/context/Web3AuthContext";
-import { requestAirdrop } from "@/utils/aptos";
+import { requestAirdrop, simulatePurchaseAPT } from "@/utils/aptos";
 import AddCardScreen from "./AddCardScreen";
 
 interface DepositScreenProps {
   onClose: () => void;
 }
 
+// Preset amount options (only integers since the faucet can only handle whole APT)
+const AMOUNT_OPTIONS = [
+  { value: "1", label: "1 APT" },
+  { value: "2", label: "2 APT" },
+  { value: "3", label: "3 APT" },
+  { value: "5", label: "5 APT" }
+];
+
 const DepositScreen: React.FC<DepositScreenProps> = ({ onClose }) => {
   const { aptosAddress, getBalance } = useWeb3Auth();
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
-  const [selectedMethod, setSelectedMethod] = useState<string | null>("aptos");
+  const [selectedMethod, setSelectedMethod] = useState<string | null>("credit");
   const [showAddCard, setShowAddCard] = useState(false);
   const [methodsVisible, setMethodsVisible] = useState(false);
   const [buttonVisible, setButtonVisible] = useState(false);
+  const [amount, setAmount] = useState("1"); // Default 1 APT
+  const [transactionDetails, setTransactionDetails] = useState<any>(null);
+  const [redirecting, setRedirecting] = useState(false);
+
+  // APT price in USD (hardcoded for demo)
+  const APT_PRICE_USD = 6.34;
 
   useEffect(() => {
     // Mostrar elementos con animación secuencial al montar
@@ -23,7 +37,26 @@ const DepositScreen: React.FC<DepositScreenProps> = ({ onClose }) => {
     setTimeout(() => setButtonVisible(true), 500);
   }, []);
 
-  const handleAirdrop = async () => {
+  // Effect to handle redirect after successful transaction
+  useEffect(() => {
+    if (success && !error && !redirecting) {
+      // Set a timer to redirect back to wallet view
+      const timer = setTimeout(() => {
+        setRedirecting(true);
+        // Animate out before redirecting
+        setMethodsVisible(false);
+        setButtonVisible(false);
+        
+        setTimeout(() => {
+          onClose(); // Return to wallet view
+        }, 800);
+      }, 3000); // Wait 3 seconds before redirecting
+      
+      return () => clearTimeout(timer);
+    }
+  }, [success, error, redirecting, onClose]);
+
+  const handlePurchase = async () => {
     if (!aptosAddress) {
       setError("Wallet address not available.");
       return;
@@ -32,21 +65,50 @@ const DepositScreen: React.FC<DepositScreenProps> = ({ onClose }) => {
     try {
       setIsLoading(true);
       setError("");
+      setSuccess(false);
+      setTransactionDetails(null);
+      setRedirecting(false);
       
-      const result = await requestAirdrop(aptosAddress);
+      // Validar monto
+      const requestedAmount = parseFloat(amount);
+      if (isNaN(requestedAmount) || requestedAmount <= 0) {
+        setError("Please enter a valid amount greater than 0.");
+        setIsLoading(false);
+        return;
+      }
       
-      if (result) {
-        setSuccess(true);
-        // Set a timer to check the balance after airdrop
-        setTimeout(() => {
-          getBalance();
-        }, 5000);
+      // Diferentes comportamientos según el método de pago seleccionado
+      if (selectedMethod === "aptos") {
+        // Usar el faucet directamente para Aptos Pay
+        const result = await requestAirdrop(aptosAddress, amount);
+        
+        if (result) {
+          setSuccess(true);
+          // Set a timer to check the balance after airdrop
+          setTimeout(() => {
+            getBalance();
+          }, 1500);
+        } else {
+          setError("Failed to request devnet tokens. Please try again later.");
+        }
       } else {
-        setError("Failed to request test tokens. Please try again later.");
+        // Simular compra con tarjeta de crédito u otros métodos
+        const result = await simulatePurchaseAPT(aptosAddress, amount, selectedMethod || "credit");
+        
+        if (result.success) {
+          setSuccess(true);
+          setTransactionDetails(result);
+          // Set a timer to check the balance after purchase
+          setTimeout(() => {
+            getBalance();
+          }, 1500);
+        } else {
+          setError("Failed to process payment. Please try again later.");
+        }
       }
     } catch (error) {
-      console.error("Error requesting airdrop:", error);
-      setError("An error occurred while requesting tokens. Please try again.");
+      console.error("Error processing transaction:", error);
+      setError("An error occurred while processing your transaction. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -156,6 +218,69 @@ const DepositScreen: React.FC<DepositScreenProps> = ({ onClose }) => {
       {/* Content */}
       <div className="flex-1 overflow-y-auto bg-gray-100 p-5">
         <div className="flex flex-col">
+          {/* Information banner about devnet */}
+          {selectedMethod === "aptos" && (
+            <div className={`mb-4 p-4 bg-blue-50 border border-blue-200 rounded-xl text-blue-700 text-sm transition-all duration-500 ${
+              methodsVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
+            }`}>
+              <div className="font-medium mb-1">Aptos Devnet Mode</div>
+              <p>This wallet is connected to Aptos Devnet, where you can get free test tokens using the faucet.</p>
+            </div>
+          )}
+          
+          {/* Amount selection */}
+          <div className={`mb-4 transition-all duration-500 ${
+            methodsVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
+          }`}>
+            <h3 className="text-sm font-medium text-gray-600 mb-2">Amount to Purchase</h3>
+            
+            {/* Preset amount buttons */}
+            <div className="grid grid-cols-2 gap-2 mb-2">
+              {AMOUNT_OPTIONS.map((option) => (
+                <button
+                  key={option.value}
+                  className={`p-3 rounded-xl text-sm font-medium transition-all duration-300 ${
+                    amount === option.value
+                      ? "bg-blue-500 text-white"
+                      : "bg-white text-gray-700 border border-gray-200 hover:bg-gray-50"
+                  }`}
+                  onClick={() => setAmount(option.value)}
+                >
+                  {option.label}
+                  {selectedMethod !== "aptos" && (
+                    <span className="block text-xs mt-1 opacity-80">
+                      ${(parseFloat(option.value) * APT_PRICE_USD).toFixed(2)} USD
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+            
+            {/* Custom amount input */}
+            <div className="flex items-center bg-white p-3 rounded-xl border border-gray-200">
+              <input
+                type="number"
+                className="flex-1 text-lg font-medium outline-none"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                min={selectedMethod === "aptos" ? "1" : "0.1"}
+                step={selectedMethod === "aptos" ? "1" : "0.1"}
+                placeholder={selectedMethod === "aptos" ? "Enter whole amount" : "Enter amount"}
+              />
+              <span className="text-gray-500 font-medium mr-2">APT</span>
+              {selectedMethod !== "aptos" && (
+                <span className="text-sm text-gray-500">
+                  ≈ ${(parseFloat(amount || "0") * APT_PRICE_USD).toFixed(2)}
+                </span>
+              )}
+            </div>
+            {selectedMethod === "aptos" && (
+              <p className="text-xs text-gray-500 mt-1 ml-1">
+                Note: Only whole numbers (1, 2, 3, etc.) are supported with Aptos Pay.
+              </p>
+            )}
+          </div>
+
           <h3 className={`text-sm font-medium text-gray-600 mb-3 transition-all duration-500 ${
             methodsVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
           }`}>Payment Method</h3>
@@ -222,9 +347,38 @@ const DepositScreen: React.FC<DepositScreenProps> = ({ onClose }) => {
             </div>
           )}
 
-          {success && (
-            <div className="p-3 mb-4 mt-4 bg-green-50 text-green-500 rounded-lg text-sm animate-bounce">
-              Airdrop requested successfully! Tokens should arrive in your wallet shortly.
+          {success && !error && (
+            <div className="p-3 mb-4 mt-4 bg-green-50 text-green-700 rounded-lg text-sm">
+              {selectedMethod === "aptos" ? (
+                <div className="animate-bounce">
+                  Faucet request successful! {amount} APT should arrive in your wallet shortly.
+                  {redirecting ? (
+                    <p className="mt-2 text-blue-500">Returning to wallet...</p>
+                  ) : (
+                    <p className="mt-2 text-xs text-green-600">Redirecting to wallet in a moment...</p>
+                  )}
+                </div>
+              ) : transactionDetails ? (
+                <div>
+                  <div className="font-medium mb-1">Purchase Successful!</div>
+                  <p>Successfully purchased {transactionDetails.amount} APT for ${transactionDetails.cost} USD.</p>
+                  <p className="text-xs mt-1 text-green-600">Transaction ID: #{Math.floor(Math.random() * 10000000)}</p>
+                  {redirecting ? (
+                    <p className="mt-2 text-blue-500">Returning to wallet...</p>
+                  ) : (
+                    <p className="mt-2 text-xs text-green-600">Redirecting to wallet in a moment...</p>
+                  )}
+                </div>
+              ) : (
+                <div className="animate-bounce">
+                  Purchase successful! {amount} APT should arrive in your wallet shortly.
+                  {redirecting ? (
+                    <p className="mt-2 text-blue-500">Returning to wallet...</p>
+                  ) : (
+                    <p className="mt-2 text-xs text-green-600">Redirecting to wallet in a moment...</p>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -233,12 +387,12 @@ const DepositScreen: React.FC<DepositScreenProps> = ({ onClose }) => {
       {/* Fixed Button at bottom */}
       <div className="p-4 border-t border-gray-200 bg-white">
         <button
-          onClick={handleAirdrop}
-          disabled={isLoading || !selectedMethod}
+          onClick={handlePurchase}
+          disabled={isLoading || !selectedMethod || success}
           className={`w-full p-4 rounded-xl text-white font-medium transition-all duration-500 transform ${
             buttonVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           } ${
-            isLoading || !selectedMethod
+            isLoading || !selectedMethod || success
               ? "bg-gray-400"
               : "bg-blue-500 hover:bg-blue-600 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
           }`}
@@ -252,7 +406,7 @@ const DepositScreen: React.FC<DepositScreenProps> = ({ onClose }) => {
                 </svg>
                 Processing...
               </span>
-            ) : "Purchase Now"}
+            ) : success ? "Transaction Complete" : selectedMethod === "aptos" ? "Get Free Devnet Tokens" : `Buy ${amount} APT for $${(parseFloat(amount || "0") * APT_PRICE_USD).toFixed(2)}`}
           </span>
         </button>
       </div>

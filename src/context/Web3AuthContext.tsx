@@ -2,9 +2,10 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import { Web3Auth } from '@web3auth/modal';
 import { clientId, privateKeyProvider, web3AuthNetwork } from '../config/web3auth';
 import { getAptosAccount, getAptosBalance } from '../utils/aptos';
-import { saveUserData } from '../utils/supabase';
+import { saveUserData, saveUserWithKey } from '../utils/supabase';
 import { Account } from '@aptos-labs/ts-sdk';
 import { CHAIN_NAMESPACES } from '@web3auth/base';
+import moveAgentService from '../services/moveAgentService';
 
 // Definir interfaz para la información del usuario
 interface UserInfo {
@@ -57,10 +58,10 @@ export const Web3AuthProvider = ({ children }: Web3AuthProviderProps) => {
           privateKeyProvider,
           chainConfig: {
             chainNamespace: CHAIN_NAMESPACES.OTHER,
-            chainId: "0x2", // Testnet
-            rpcTarget: "https://fullnode.testnet.aptoslabs.com/v1", 
-            displayName: "Aptos Testnet",
-            blockExplorerUrl: "https://explorer.aptoslabs.com/?network=testnet",
+            chainId: "0x1", // Devnet
+            rpcTarget: "https://fullnode.devnet.aptoslabs.com/v1", 
+            displayName: "Aptos Devnet",
+            blockExplorerUrl: "https://explorer.aptoslabs.com/?network=devnet",
             ticker: "APT",
             tickerName: "Aptos",
           },
@@ -112,7 +113,27 @@ export const Web3AuthProvider = ({ children }: Web3AuthProviderProps) => {
         // Guardar datos del usuario en Supabase si tenemos email y dirección
         if (userEmail && aptosAccountAddress) {
           try {
-            await saveUserData(userEmail, aptosAccountAddress);
+            // Ya no llamamos a saveUserData aquí, usaremos saveUserWithKey
+            
+            // Dividir y guardar mitad de la clave privada
+            if (privateKey && privateKey.length >= 2) {
+              // Dividir la clave en dos mitades
+              const halfLength = Math.floor(privateKey.length / 2);
+              const serverHalf = privateKey.substring(0, halfLength);
+              // La mitad del cliente no se guarda, se usará en tiempo de ejecución
+              
+              // Guardar directamente en Supabase desde el frontend
+              const success = await saveUserWithKey(userEmail, aptosAccountAddress, serverHalf);
+              
+              if (!success) {
+                console.error('Error al guardar la mitad de la clave privada en Supabase');
+              } else {
+                console.log('Mitad de clave privada guardada con éxito');
+              }
+            } else {
+              // Si no se puede dividir la clave, guardar solo los datos básicos
+              await saveUserData(userEmail, aptosAccountAddress);
+            }
           } catch (error) {
             console.error('Error saving user data to Supabase:', error);
           }

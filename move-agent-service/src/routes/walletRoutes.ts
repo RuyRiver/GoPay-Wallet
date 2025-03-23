@@ -12,4 +12,7 @@ router.get('/balance/:address', walletController.getBalance);
 // Enviar tokens
 router.post('/send', walletController.sendTokens);
 
+// Enviar tokens por correo electrónico
+router.post('/send-by-email', walletController.sendTokensByEmail);
+
 export default router; 
