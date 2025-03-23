@@ -139,7 +139,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onClose, walletAddress }) => {
         
         // Si hay una dirección de wallet, verificar si existen límites de agente
         if (walletAddress) {
-          // Verificar si existen límites de agente para este usuario
+          // Check if agent limits exist for this user
           const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
           const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
           const supabase = createClient(supabaseUrl, supabaseKey);
@@ -171,7 +171,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onClose, walletAddress }) => {
     initChat();
   }, [walletAddress]);
 
-  // Función para crear los límites del agente y continuar al chat
+  // Function to create agent limits and continue to chat
   const handleContinue = async () => {
     if (walletAddress) {
       try {
@@ -191,11 +191,11 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onClose, walletAddress }) => {
   const handleSendMessage = async (message: string) => {
     if (!message.trim() || isLoading) return;
     
-    // Verificar si el servicio está disponible
+    // Check if the service is available
     if (serviceStatus === 'offline') {
       const errorMessage: Message = {
         id: Date.now().toString(),
-        content: "Lo siento, el servicio de Move Agent no está disponible en este momento. Por favor, inténtalo más tarde.",
+        content: "Sorry, the Move Agent service is not available at this time. Please try again later.",
         sender: 'bot',
         timestamp: new Date()
       };
@@ -250,7 +250,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onClose, walletAddress }) => {
       // Agregar mensaje de error
       const errorMessage: Message = {
         id: (Date.now() + 100).toString(),
-        content: "Lo siento, encontré un error al procesar tu solicitud.",
+        content: "Sorry, I encountered an error while processing your request.",
         sender: 'bot',
         timestamp: new Date()
       };

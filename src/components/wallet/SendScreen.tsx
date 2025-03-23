@@ -90,7 +90,7 @@ const SendScreen: React.FC<SendScreenProps> = ({ onClose, initialAddress = null 
       // If it's an email, use sendTransactionByEmail, otherwise use sendTransaction
       if (isEmail(recipient)) {
         if (!emailExists) {
-          setError("El correo electrónico no está registrado en el sistema");
+          setError("The email is not registered in the system");
           setIsLoading(false);
           return;
         }
@@ -198,7 +198,7 @@ const SendScreen: React.FC<SendScreenProps> = ({ onClose, initialAddress = null 
               
               {isEmailMode && emailExists === false && (
                 <p className="text-xs text-red-500 mt-1">
-                  Este correo electrónico no está registrado en el sistema. El usuario debe registrarse primero.
+                  This email is not registered in the system. The user must register first.
                 </p>
               )}
               
@@ -276,4 +276,4 @@ const SendScreen: React.FC<SendScreenProps> = ({ onClose, initialAddress = null 
   );
 };
 
-export default SendScreen; 
+export default SendScreen;
