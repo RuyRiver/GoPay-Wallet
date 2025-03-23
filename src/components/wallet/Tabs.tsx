@@ -28,9 +28,9 @@ const Tabs: React.FC<TabsProps> = ({
   }, [activeTab]);
 
   return (
-    <div ref={tabsRef} className="self-stretch bg-[rgba(243,245,246,1)] flex items-center gap-auto text-sm font-semibold whitespace-nowrap text-center justify-center p-1 rounded-2xl px-[4px] relative">
+    <div ref={tabsRef} className="self-stretch bg-[rgba(243,245,246,1)] flex items-center gap-auto text-sm font-semibold whitespace-nowrap text-center justify-center p-1 rounded-2xl relative">
       <div 
-        className="absolute h-12 bg-[rgba(39,39,41,1)] rounded-2xl transition-all duration-300 ease-in-out z-0" 
+        className="absolute h-12 bg-[rgba(39,39,41,1)] rounded-[12px] transition-all duration-300 ease-in-out z-0" 
         style={{ 
           left: `${indicatorStyle.left}px`, 
           width: `${indicatorStyle.width}px` 

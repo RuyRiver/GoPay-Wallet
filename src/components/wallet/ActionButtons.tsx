@@ -15,7 +15,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
   onSwap,
 }) => {
   return (
-    <div className="flex gap-[34px] mt-8">
+    <div className="flex gap-[34px] my-4 justify-center w-full">
       <ActionButton
         icon="https://cdn.builder.io/api/v1/image/assets/20e65f047558427aa511c5569cf902c1/385e4d382b635f90a186d9dcbc99c4e972a9dbcc?placeholderIfAbsent=true"
         label="Send"
