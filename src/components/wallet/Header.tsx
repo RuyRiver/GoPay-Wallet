@@ -14,7 +14,7 @@ const Header: React.FC<HeaderProps> = ({
   onSettingsClick
 }) => {
   return <div className="flex flex-col relative w-full max-w-[312px] text-center pb-[149px] mx-auto">
-      <img src="https://cdn.builder.io/api/v1/image/assets/20e65f047558427aa511c5569cf902c1/f9927576fb062199e2c461e3868414cd8527b166?placeholderIfAbsent=true" className="absolute h-full w-full object-cover inset-0" alt="Background" />
+      <img src="/assets/gg_shape_01_1.webp" className="absolute h-full w-full object-cover inset-0" alt="Background" />
       <div className="relative self-stretch flex w-full items-center text-2xl text-black font-bold whitespace-nowrap justify-between px-5 py-3">
         <Button 
           variant="ghost" 
