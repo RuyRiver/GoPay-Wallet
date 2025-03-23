@@ -53,7 +53,7 @@ const AgentLimitsPanel: React.FC<AgentLimitsPanelProps> = ({ walletAddress }) =>
             whitelist_addresses: []
           });
           updateFormValues({
-            ...DEFAULT_LIMITS,
+            ...DEFAULT_LIMITS, user_address: walletAddress,
             whitelist_addresses: []
           });
         } else {
@@ -132,7 +132,7 @@ const AgentLimitsPanel: React.FC<AgentLimitsPanelProps> = ({ walletAddress }) =>
 
   // Restablecer a valores predeterminados
   const handleReset = async () => {
-    if (confirm('¿Estás seguro de restablecer todos los límites a los valores predeterminados?')) {
+    if (confirm('Are you sure you want to reset all limits to default values?')) {
       try {
         const defaultValues = {
           ...DEFAULT_LIMITS,
@@ -272,7 +272,7 @@ const AgentLimitsPanel: React.FC<AgentLimitsPanelProps> = ({ walletAddress }) =>
               placeholder="0x123...\n0x456..."
             />
             <p className="text-xs text-gray-500 mt-1">
-              Deja en blanco para permitir todas las direcciones
+              Leave blank to allow all addresses
             </p>
           </div>
           
@@ -335,4 +335,4 @@ const AgentLimitsPanel: React.FC<AgentLimitsPanelProps> = ({ walletAddress }) =>
   );
 };
 
-export default AgentLimitsPanel; 
+export default AgentLimitsPanel;

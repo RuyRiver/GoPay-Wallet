@@ -1,9 +1,9 @@
 /**
- * Servicio para interactuar con el Move Agent Service
+ * Service to interact with the Move Agent Service
  */
 import { getEndpointUrl, moveAgentConfig } from '@/config/moveAgent';
 
-// Tipos de datos para las respuestas
+// Data types for responses
 export interface AgentResponse {
   success: boolean;
   message: string;
@@ -16,21 +16,21 @@ export interface AgentResponse {
   };
 }
 
-// Tipos de datos para solicitudes
+// Data types for requests
 export interface AgentRequest {
   message: string;
   address?: string;
   privateKeyHalf?: string;
 }
 
-// Servicio para comunicarse con el Move Agent
+// Service to communicate with the Move Agent
 const moveAgentService = {
   /**
-   * Procesar un mensaje a través del agent
-   * @param message Mensaje a procesar
-   * @param address Dirección de wallet opcional
-   * @param privateKeyHalf Mitad de la clave privada opcional
-   * @returns Respuesta del agente
+   * Process a message through the agent
+   * @param message Message to process
+   * @param address Optional wallet address
+   * @param privateKeyHalf Optional private key half
+   * @returns Agent response
    */
   async processMessage(message: string, address?: string, privateKeyHalf?: string): Promise<AgentResponse> {
     try {
@@ -50,25 +50,25 @@ const moveAgentService = {
 
       return await response.json();
     } catch (error) {
-      console.error('Error al procesar mensaje con Move Agent:', error);
+      console.error('Error processing message with Move Agent:', error);
       
       // Formatear el error en el formato de respuesta esperado
       return {
         success: false,
-        message: error instanceof Error ? error.message : 'Error desconocido al conectar con el agente'
+        message: error instanceof Error ? error.message : 'Unknown error connecting to agent'
       };
     }
   },
 
   /**
-   * Verificar el estado del servicio
-   * @returns Estado del servicio
+   * Check service status
+   * @returns Service status
    */
   async checkStatus(): Promise<{ status: string; message: string; version: string; }> {
     try {
       const response = await fetch(getEndpointUrl('status'), {
         method: 'GET',
-        // Timeout más corto para verificación de estado
+        // Shorter timeout for status check
         signal: AbortSignal.timeout(5000)
       });
 
@@ -78,21 +78,21 @@ const moveAgentService = {
 
       return await response.json();
     } catch (error) {
-      console.error('Error al verificar estado del Move Agent Service:', error);
+      console.error('Error checking Move Agent Service status:', error);
       return {
         status: 'error',
-        message: 'No se pudo conectar con el servicio',
-        version: 'desconocida'
+        message: 'Could not connect to service',
+        version: 'unknown'
       };
     }
   },
 
   /**
-   * Registrar la mitad de la clave privada para un usuario
-   * @param email Email del usuario
-   * @param address Dirección de la wallet
-   * @param privateKeyHalf Mitad de la clave privada para almacenar
-   * @returns Respuesta del servicio
+   * Register the private key half for a user
+   * @param email User's email
+   * @param address Wallet address
+   * @param privateKeyHalf Private key half to store
+   * @returns Service response
    */
   async registerWithKey(email: string, address: string, privateKeyHalf: string): Promise<{success: boolean; message: string}> {
     try {
@@ -111,13 +111,13 @@ const moveAgentService = {
 
       return await response.json();
     } catch (error) {
-      console.error('Error al registrar usuario con mitad de clave:', error);
+      console.error('Error registering user with key half:', error);
       return {
         success: false,
-        message: error instanceof Error ? error.message : 'Error desconocido al registrar clave'
+        message: error instanceof Error ? error.message : 'Unknown error registering key'
       };
     }
   }
 };
 
-export default moveAgentService; 
+export default moveAgentService;

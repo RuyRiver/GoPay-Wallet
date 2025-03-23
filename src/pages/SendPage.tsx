@@ -10,7 +10,7 @@ const SendPage: React.FC = () => {
   const [addressParam, setAddressParam] = useState<string | null>(null);
 
   useEffect(() => {
-    // Obtener la dirección de los parámetros de la URL si existe
+    // Get address from URL parameters if it exists
     const address = searchParams.get("address");
     if (address) {
       setAddressParam(address);
@@ -18,13 +18,13 @@ const SendPage: React.FC = () => {
   }, [searchParams]);
 
   useEffect(() => {
-    // Si no está logueado, redirigir a la página de inicio
+    // If not logged in, redirect to home page
     if (isInitialized && !isLoggedIn && !isLoading) {
       navigate("/");
     }
   }, [isLoggedIn, isInitialized, isLoading, navigate]);
 
-  // Mostrar spinner mientras verifica inicio de sesión
+  // Show spinner while verifying login status
   if (isLoading || !isInitialized) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -33,7 +33,7 @@ const SendPage: React.FC = () => {
     );
   }
 
-  // No renderizar nada si no está logueado (redirigirá en el useEffect)
+  // Don't render anything if not logged in (will redirect in useEffect)
   if (!isLoggedIn) {
     return null;
   }
@@ -50,4 +50,4 @@ const SendPage: React.FC = () => {
   );
 };
 
-export default SendPage; 
+export default SendPage;

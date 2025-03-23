@@ -49,7 +49,7 @@ const WalletScreen: React.FC = () => {
     return () => clearInterval(intervalId);
   }, [getBalance]);
 
-  // Efecto para mostrar la animación de la vista principal cuando se monta
+  // Effect to show the main view animation when mounted
   useEffect(() => {
     setMainViewVisible(true);
   }, []);
@@ -69,33 +69,33 @@ const WalletScreen: React.FC = () => {
 
   const totalUsdBalance = getUsdValue(aptosBalance);
 
-  // Gestión mejorada de transiciones entre vistas
+  // Enhanced view transition management
   const handleShowView = (view: "main" | "send" | "receive" | "deposit" | "swap" | "settings" | "chat") => {
     if (view === "main") {
-      // Ocultamos la vista actual (que no es main)
+      // Hide current view (non-main)
       setExitingView(currentView);
       setMainViewVisible(false);
       
-      // Después de un breve retraso, actualizamos la vista y mostramos main
+      // After a brief delay, update view and show main
       setTimeout(() => {
         setExitingView("");
         setCurrentView("main");
         setMainViewVisible(true);
       }, 400);
     } else if (currentView !== "main") {
-      // Si ya hay una vista diferente a main, primero la ocultamos con animación
+      // If there's already a different view than main, first hide it with animation
       setExitingView(currentView);
       setCurrentView("main");
       setMainViewVisible(true);
       
-      // Después de un breve retraso para la transición, mostramos la nueva vista
+      // After a brief delay for transition, show the new view
       setTimeout(() => {
         setExitingView("");
         setMainViewVisible(false);
         setCurrentView(view);
       }, 500);
     } else {
-      // Si estamos en la vista principal, animamos la salida y mostramos la nueva vista
+      // If we're in the main view, animate exit and show new view
       setMainViewVisible(false);
       setTimeout(() => {
         setCurrentView(view);
@@ -140,14 +140,14 @@ const WalletScreen: React.FC = () => {
     await logout();
   };
 
-  // Verificación de si una vista está activa o saliendo (para animaciones)
+  // Check if a view is active or exiting (for animations)
   const isViewActive = (view: string) => {
     return currentView === view || exitingView === view;
   };
 
   return (
     <div className="bg-[rgba(243,245,246,1)] flex max-w-[480px] w-full flex-col overflow-hidden items-center mx-auto pt-[53px] h-full">
-      {/* Vista principal con animación */}
+      {/* Main view with animation */}
       {currentView === "main" && (
         <div className={`flex flex-col items-center w-full transition-all duration-500 transform ${mainViewVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           <Header 
@@ -183,7 +183,7 @@ const WalletScreen: React.FC = () => {
         </div>
       )}
 
-      {/* Vistas animadas */}
+      {/* Animated views */}
       <AnimatedView show={isViewActive("send")} direction="right">
         <SendScreen onClose={() => handleShowView("main")} />
       </AnimatedView>

@@ -91,7 +91,7 @@ const ReceiveScreen: React.FC<ReceiveScreenProps> = ({ onClose }) => {
                 className="w-full h-full"
               />
               <p className="text-xs text-center text-gray-500 mt-2">
-                Escanea para enviar tokens a esta dirección
+                Scan to send tokens to this address
               </p>
             </div>
           ) : (
@@ -133,11 +133,11 @@ const ReceiveScreen: React.FC<ReceiveScreenProps> = ({ onClose }) => {
         </button>
         
         <p className="text-center text-xs text-gray-500 mt-4">
-          Comparte tu código QR o dirección para recibir tokens APT
+          Share your QR code or address to receive APT tokens
         </p>
       </div>
     </div>
   );
 };
 
-export default ReceiveScreen; 
+export default ReceiveScreen;

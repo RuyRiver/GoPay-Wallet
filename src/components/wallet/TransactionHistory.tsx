@@ -76,7 +76,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ address }) => {
   // Determina si el usuario es el remitente
   const isSender = (tx: Transaction) => tx.from_address.toLowerCase() === address.toLowerCase();
 
-  // Acorta una dirección para mostrarla
+  // Shorten an address for display
   const shortenAddress = (addr: string) => {
     if (!addr) return "";
     return `${addr.substring(0, 6)}...${addr.substring(addr.length - 4)}`;
@@ -96,7 +96,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ address }) => {
       <div className="flex flex-col items-center justify-center h-full p-8">
         <Clock className="h-12 w-12 text-gray-300 mb-4" />
         <p className="text-gray-500 text-center">
-          No hay transacciones para mostrar. Cuando envíes o recibas tokens, aparecerán aquí.
+          No transactions to show. When you send or receive tokens, they will appear here.
         </p>
       </div>
     );
@@ -169,4 +169,4 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ address }) => {
   );
 };
 
-export default TransactionHistory; 
+export default TransactionHistory;
