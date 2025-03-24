@@ -4,7 +4,7 @@ import { AuthButtons } from "./AuthButtons";
 
 export function StartScreen() {
   return (
-    <div className= "flex flex-col h-screen w-full overflow-hidden fixed inset-0">
+    <div className= "flex flex-col h-[100dvh] w-full overflow-hidden fixed inset-0">
       {/* Video Background */}
       <div className="absolute inset-0 overflow-hidden z-0">
         <video 

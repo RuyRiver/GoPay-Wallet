@@ -14,7 +14,7 @@ const Index = () => {
   }, [isLoggedIn, isInitialized, navigate]);
 
   return (
-    <main className="min-h-screen h-screen flex items-center justify-center bg-gray-100">
+    <main className="h-[100dvh] flex items-center justify-center bg-gray-100">
       <StartScreen />
     </main>
   );
