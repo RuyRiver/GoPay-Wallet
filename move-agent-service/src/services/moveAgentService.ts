@@ -661,9 +661,16 @@ IMPORTANTE: El usuario está escribiendo en ${getLanguageName(language)}, así q
           const aptBalance = parseFloat(balance['APT'] || '0');
           const usdValue = (aptBalance * 6.34).toFixed(2); // $6.34 por APT
           
-          return {
-            content: `Tu balance actual es: ${aptBalance.toFixed(4)} APT (aproximadamente $${usdValue} USD).`
-          };
+          // Use the correct language for the response
+          if (language === 'en') {
+            return {
+              content: `Your current balance is: ${aptBalance.toFixed(4)} APT (approximately $${usdValue} USD).`
+            };
+          } else {
+            return {
+              content: `Tu balance actual es: ${aptBalance.toFixed(4)} APT (aproximadamente $${usdValue} USD).`
+            };
+          }
         } catch (error) {
           console.error('Error al obtener balance:', error);
           // Importar las utilidades de idioma si aún no se han importado
