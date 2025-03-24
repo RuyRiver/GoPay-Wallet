@@ -478,6 +478,16 @@ export const moveAgentService = {
         }
       }
       
+      // Importar la función de detección de idioma
+      const { detectLanguage } = await import('../config/appInfo');
+      
+      // Detectar el idioma del mensaje
+      const language = detectLanguage(message);
+      console.log(`Idioma detectado en moveAgentService: ${language}`);
+      
+      // Importar las utilidades de idioma
+      const { getLanguageInstruction, getLanguageName } = await import('../utils/languageUtils');
+      
       // Crear un prompt de sistema enriquecido con datos de blockchain
       const systemPrompt = `Eres un asistente financiero especializado en blockchain Aptos integrado con move-agent-kit.
 Tu objetivo es ayudar al usuario con consultas sobre wallet, transacciones y balances en Aptos blockchain.
@@ -495,8 +505,10 @@ ACCIONES DISPONIBLES:
 
 Puedes realizar transferencias en APT o en USD (estas se convierten automáticamente a APT usando una tasa de 1 APT = $6.34 USD).
 
-IDIOMAS SOPORTADOS:
-Responde en el mismo idioma que use el usuario (inglés o español). Detecta automáticamente el idioma y mantén la conversación en ese idioma.`;
+IDIOMA REQUERIDO:
+${getLanguageInstruction(language)}
+
+IMPORTANTE: El usuario está escribiendo en ${getLanguageName(language)}, así que DEBES mantener toda la conversación en ese mismo idioma.`;
 
       // Usar un identificador único para el usuario (usando la dirección si está disponible)
       const userIdentifier = address || 'anonymous-user';
@@ -534,8 +546,10 @@ Responde en el mismo idioma que use el usuario (inglés o español). Detecta aut
           
           // Verificar si el usuario tiene dirección
           if (!address) {
+            // Importar las utilidades de idioma si aún no se han importado
+            const { getTranslatedMessage } = await import('../utils/languageUtils');
             return { 
-              content: 'Para realizar transferencias, necesito que te conectes con tu wallet. Por favor, conecta tu wallet e intenta nuevamente.' 
+              content: getTranslatedMessage('walletRequired', language)
             };
           }
           
@@ -546,8 +560,15 @@ Responde en el mismo idioma que use el usuario (inglés o español). Detecta aut
           
           if (amountInApt > aptBalance) {
             console.log('Fondos insuficientes');
+            // Importar las utilidades de idioma si aún no se han importado
+            const { getTranslatedMessage } = await import('../utils/languageUtils');
             return { 
-              content: `No tienes suficientes fondos para enviar ${originalAmount} ${currency} (${amountInApt.toFixed(4)} APT). Tu balance actual es ${aptBalance.toFixed(4)} APT.` 
+              content: getTranslatedMessage('insufficientFunds', language, {
+                amount: originalAmount,
+                currency: currency,
+                amountInApt: amountInApt.toFixed(4),
+                balance: aptBalance.toFixed(4)
+              })
             };
           }
           
@@ -586,36 +607,52 @@ Responde en el mismo idioma que use el usuario (inglés o español). Detecta aut
             const txHash = txResult.txHash;
             console.log(`Transaction successful. Hash: ${txHash}`);
             
-            // Mensaje de éxito personalizado según la moneda
-            let successMessage = '';
-            if (currency.toUpperCase() === 'USD') {
-              successMessage = `Transaction successful! I've sent ${originalAmount.toFixed(2)} USD (equivalent to ${amountInApt.toFixed(4)} APT) to ${recipient}.`;
-            } else {
-              successMessage = `Transaction successful! I've sent ${originalAmount} APT to ${recipient}.`;
-            }
+            // Importar las utilidades de idioma si aún no se han importado
+            const { getTranslatedMessage } = await import('../utils/languageUtils');
+            
+            // Formatear el monto según la moneda
+            const formattedAmount = currency.toUpperCase() === 'USD' 
+              ? `${originalAmount.toFixed(2)} USD (equivalent to ${amountInApt.toFixed(4)} APT)` 
+              : `${originalAmount} APT`;
             
             return {
-              content: `${successMessage}\n\nHash de la transacción: ${txHash}\n\nLa transacción ha sido registrada en la blockchain.`
+              content: getTranslatedMessage('transferSuccess', language, {
+                amount: formattedAmount,
+                currency: currency.toUpperCase() === 'USD' ? 'USD' : 'APT',
+                recipient: recipient,
+                txHash: txHash
+              })
             };
           } else {
             console.log('Error en la transacción:', txResult.message);
+            // Importar las utilidades de idioma si aún no se han importado
+            const { getTranslatedMessage } = await import('../utils/languageUtils');
             return {
-              content: `No pude completar la transferencia: ${txResult.message || 'Error desconocido'}`
+              content: getTranslatedMessage('transferError', language, {
+                message: txResult.message || 'Error desconocido'
+              })
             };
           }
         } catch (error) {
           console.error('Error al procesar la transferencia:', error);
+          // Importar las utilidades de idioma si aún no se han importado
+          const { getTranslatedMessage } = await import('../utils/languageUtils');
           return {
-            content: `Ocurrió un error al procesar la transferencia: ${error instanceof Error ? error.message : 'Error desconocido'}`
+            content: getTranslatedMessage('generalError', language, {
+              message: error instanceof Error ? error.message : 'Error desconocido'
+            })
           };
         }
       } else if (aiResponse.intent && aiResponse.intent.type === 'check_balance') {
         // Procesar la consulta de balance
         console.log('Consulta de balance detectada');
         
+        // Importar las utilidades de idioma si aún no se han importado
+        const { getTranslatedMessage } = await import('../utils/languageUtils');
+        
         if (!address) {
           return { 
-            content: 'Para consultar tu balance, necesito que te conectes con tu wallet. Por favor, conecta tu wallet e intenta nuevamente.' 
+            content: getTranslatedMessage('balanceRequired', language)
           };
         }
         
@@ -629,8 +666,12 @@ Responde en el mismo idioma que use el usuario (inglés o español). Detecta aut
           };
         } catch (error) {
           console.error('Error al obtener balance:', error);
+          // Importar las utilidades de idioma si aún no se han importado
+          const { getTranslatedMessage } = await import('../utils/languageUtils');
           return {
-            content: `Ocurrió un error al consultar tu balance: ${error instanceof Error ? error.message : 'Error desconocido'}`
+            content: getTranslatedMessage('balanceError', language, {
+              message: error instanceof Error ? error.message : 'Error desconocido'
+            })
           };
         }
       }
@@ -642,8 +683,17 @@ Responde en el mismo idioma que use el usuario (inglés o español). Detecta aut
       };
     } catch (error) {
       console.error('Error general en processMessage:', error);
+      // Importar las utilidades de idioma si aún no se han importado
+      const { getTranslatedMessage } = await import('../utils/languageUtils');
+      // Obtener el idioma del mensaje o usar español como valor predeterminado
+      const { detectLanguage } = await import('../config/appInfo');
+      const detectedLanguage = message ? detectLanguage(message) : 'es';
       // Devolver un mensaje de error formateado
-      return { content: `Error al procesar tu solicitud: ${error instanceof Error ? error.message : 'Error desconocido'}` };
+      return { 
+        content: getTranslatedMessage('generalError', detectedLanguage, {
+          message: error instanceof Error ? error.message : 'Error desconocido'
+        })
+      };
     }
   },
   
@@ -680,7 +730,7 @@ Responde en el mismo idioma que use el usuario (inglés o español). Detecta aut
             { role: 'system', content: 'Eres un asistente especializado en analizar mensajes de usuarios para determinar sus intenciones en el contexto de una wallet digital.' },
             { role: 'user', content: prompt }
           ],
-          temperature: 0.0 // Temperatura baja para respuestas precisas y deterministas
+          temperature: 0.0
         })
       });
       

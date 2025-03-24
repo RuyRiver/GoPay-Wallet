@@ -5,7 +5,7 @@ import { Request, Response } from 'express';
 import { moveAgentService } from '../services/moveAgentService';
 import { userService } from '../services/supabaseService';
 import { ApiResponse, ProcessMessageRequest, SendTokenRequest } from '../types';
-import { appInfo, detectLanguage, APT_PRICE_USD } from '../config/appInfo';
+import { appInfo, detectLanguage, detectLanguageWithLLM, APT_PRICE_USD } from '../config/appInfo';
 import { intentService, IntentType } from '../services/intentService';
 import { supabase } from '../config/supabase';
 
@@ -97,9 +97,21 @@ export const agentController = {
       console.log(`Procesando mensaje para: ${address || 'usuario sin dirección'}`);
       console.log(`Mensaje recibido: "${originalMessage}"`);
       
-      // Detectar el idioma del mensaje
-      const language = detectLanguage(originalMessage);
-      console.log(`Idioma detectado: ${language}`);
+      // Detectar el idioma del mensaje usando LLM
+      // Primero usamos el método heurístico para una respuesta rápida
+      let language = detectLanguage(originalMessage);
+      console.log(`Idioma detectado (heurística): ${language}`);
+      
+      // Iniciamos la detección con LLM en paralelo
+      detectLanguageWithLLM(originalMessage).then(llmLanguage => {
+        // Si el LLM detecta un idioma diferente, lo actualizamos para futuras interacciones
+        if (llmLanguage !== language) {
+          console.log(`Idioma actualizado por LLM: ${llmLanguage}`);
+          language = llmLanguage;
+        }
+      }).catch(error => {
+        console.error('Error en detección de idioma con LLM:', error);
+      });
       
       // Si tenemos un correo electrónico, intentamos resolverlo a una dirección
       let resolvedAddress = address;
@@ -401,10 +413,11 @@ export const agentController = {
         ? `${processedMessage}\n\n${extraContext}` 
         : processedMessage;
       
+      // Importar las utilidades de idioma
+      const { getLanguageInstruction } = await import('../utils/languageUtils');
+      
       // Añadir instrucción para responder en el idioma del usuario
-      const languageInstruction = language === 'es'
-        ? "\nRECUERDA: Por favor responde SIEMPRE en español como lo está haciendo el usuario."
-        : "\nREMEMBER: Please ALWAYS respond in English as the user is doing.";
+      const languageInstruction = `\nRECUERDA: ${getLanguageInstruction(language)}`;
       
       const finalMessage = `${enrichedMessage}\n${languageInstruction}`;
       
@@ -514,4 +527,4 @@ export const agentController = {
       });
     }
   }
-}; 
+};
