@@ -146,7 +146,7 @@ const WalletScreen: React.FC = () => {
   };
 
   return (
-    <div className="bg-gray-50 flex flex-col h-screen-real w-full overflow-hidden fixed inset-0">
+    <div className="bg-gray-50 flex flex-col h-[100dvh] w-full overflow-hidden fixed inset-0">
       {/* Video Background */}
       <div className="absolute inset-0 overflow-hidden z-0">
         <video 

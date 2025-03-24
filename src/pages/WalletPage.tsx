@@ -17,7 +17,7 @@ const WalletPage: React.FC = () => {
   // Show loading spinner while checking login state
   if (isLoading || !isInitialized) {
     return (
-      <div className="min-h-screen-real flex items-center justify-center bg-gray-100">
+      <div className="h-[100dvh] flex items-center justify-center bg-gray-100">
         <Spinner />
       </div>
     );
@@ -29,7 +29,7 @@ const WalletPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen-real flex items-center justify-center bg-gray-100 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
       <WalletScreen />
     </div>
   );
