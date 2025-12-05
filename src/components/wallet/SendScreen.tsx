@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { useWeb3Auth } from "@/context/Web3AuthContext";
-import { sendTransaction, sendTransactionByEmail } from "@/utils/aptos";
+import { useGoogleAuth } from "@/context/GoogleAuthContext";
+import { send, checkEmailExists } from "@/services/sendTransaction";
+import PortfolioService from "@/services/portfolioService";
+import ContactsList from "./ContactsList";
+import { type Contact } from "@/services/contactsService";
+import { User } from "lucide-react";
 
 interface SendScreenProps {
   onClose: () => void;
   initialAddress?: string | null;
+  initialTokenSymbol?: string | null;
+  initialContact?: Contact | null;
 }
 
-const SendScreen: React.FC<SendScreenProps> = ({ onClose, initialAddress = null }) => {
+const SendScreen: React.FC<SendScreenProps> = ({ onClose, initialAddress = null, initialTokenSymbol = null, initialContact = null }) => {
   const [recipient, setRecipient] = useState("");
   const [amount, setAmount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -17,14 +23,45 @@ const SendScreen: React.FC<SendScreenProps> = ({ onClose, initialAddress = null 
   const [isEmailMode, setIsEmailMode] = useState(false);
   const [emailCheckLoading, setEmailCheckLoading] = useState(false);
   const [emailExists, setEmailExists] = useState<boolean | null>(null);
-  
-  const { aptosAccount, getBalance, aptosBalance } = useWeb3Auth();
+  const [selectedToken, setSelectedToken] = useState<string>(initialTokenSymbol || 'STX');
+  const [tokenBalance, setTokenBalance] = useState<number>(0);
+  const [showContacts, setShowContacts] = useState(false);
+
+  const { user } = useGoogleAuth();
 
   useEffect(() => {
     if (initialAddress) {
       setRecipient(initialAddress);
     }
   }, [initialAddress]);
+
+  // Set recipient from initialContact
+  useEffect(() => {
+    if (initialContact) {
+      // If contact has an email, use that, otherwise use the address value
+      if (initialContact.type === 'email') {
+        setRecipient(initialContact.value);
+      } else {
+        setRecipient(initialContact.value);
+      }
+    }
+  }, [initialContact]);
+
+  // Load token balance based on selected token
+  useEffect(() => {
+    const loadBalance = async () => {
+      try {
+        const balance = await PortfolioService.getTokenBalance(selectedToken, 'mainnet');
+        if (balance) {
+          setTokenBalance(parseFloat(balance.balance));
+        }
+      } catch (error) {
+        console.error(`Error loading ${selectedToken} balance:`, error);
+      }
+    };
+
+    loadBalance();
+  }, [selectedToken]);
 
   // Check if the input is an email address
   const isEmail = (input: string) => {
@@ -33,9 +70,10 @@ const SendScreen: React.FC<SendScreenProps> = ({ onClose, initialAddress = null 
 
   // Check if recipient email exists when the input changes
   useEffect(() => {
-    const checkEmailExists = async () => {
+    const checkEmail = async () => {
       if (!recipient || !isEmail(recipient)) {
         setEmailExists(null);
+        setIsEmailMode(false);
         return;
       }
 
@@ -43,12 +81,8 @@ const SendScreen: React.FC<SendScreenProps> = ({ onClose, initialAddress = null 
       setEmailCheckLoading(true);
 
       try {
-        const response = await fetch(
-          `${import.meta.env.VITE_MOVE_AGENT_SERVICE_URL || 'http://localhost:3001'}/api/user/check-email/${encodeURIComponent(recipient)}`
-        );
-        
-        const data = await response.json();
-        setEmailExists(data.success && data.data.exists);
+        const exists = await checkEmailExists(recipient);
+        setEmailExists(exists);
       } catch (error) {
         console.error("Error checking email:", error);
         setEmailExists(false);
@@ -59,52 +93,49 @@ const SendScreen: React.FC<SendScreenProps> = ({ onClose, initialAddress = null 
 
     // Debounce the email check to avoid making too many requests
     const handler = setTimeout(() => {
-      checkEmailExists();
+      checkEmail();
     }, 500);
 
     return () => clearTimeout(handler);
   }, [recipient]);
 
   const handleSend = async () => {
-    if (!recipient || !amount || !aptosAccount) {
+    if (!recipient || !amount) {
       setError("Please enter a valid address or email and amount");
       return;
     }
 
     // Check if amount is more than balance
-    const balanceInApt = aptosBalance / 100000000;
-    if (parseFloat(amount) > balanceInApt) {
+    if (parseFloat(amount) > tokenBalance) {
       setError("Insufficient balance");
+      return;
+    }
+
+    // If email, check it exists
+    if (isEmail(recipient) && !emailExists) {
+      setError("The email is not registered in the system");
       return;
     }
 
     try {
       setIsLoading(true);
       setError("");
-      
-      // Convert amount to octas (APT * 10^8)
-      const amountInOctas = Math.floor(parseFloat(amount) * 100000000).toString();
-      
-      let txHash;
-      
-      // If it's an email, use sendTransactionByEmail, otherwise use sendTransaction
-      if (isEmail(recipient)) {
-        if (!emailExists) {
-          setError("The email is not registered in the system");
-          setIsLoading(false);
-          return;
-        }
-        
-        txHash = await sendTransactionByEmail(aptosAccount, recipient, amountInOctas);
-      } else {
-        txHash = await sendTransaction(aptosAccount, recipient, amountInOctas);
-      }
-      
-      console.log("Transaction hash:", txHash);
-      
+
+      console.log('[SendScreen] Sending', amount, selectedToken, 'to', recipient);
+
+      // Use the unified send function (handles both email and address)
+      const txHash = await send(recipient, amount, selectedToken);
+
+      console.log('[SendScreen] Transaction hash:', txHash);
+
       setSuccess(true);
-      getBalance(); // Update balance after transaction
-      
+
+      // Reload balance after transaction
+      const balance = await PortfolioService.getTokenBalance(selectedToken, 'mainnet');
+      if (balance) {
+        setTokenBalance(parseFloat(balance.balance));
+      }
+
     } catch (error) {
       console.error("Error sending transaction:", error);
       setError(error instanceof Error ? error.message : "Error sending transaction");
@@ -114,13 +145,18 @@ const SendScreen: React.FC<SendScreenProps> = ({ onClose, initialAddress = null 
   };
 
   const formatMaxBalance = () => {
-    const balanceInApt = aptosBalance / 100000000;
-    return balanceInApt.toFixed(4);
+    return tokenBalance.toFixed(4);
   };
 
   const handleSetMax = () => {
-    const balanceInApt = aptosBalance / 100000000;
-    setAmount(balanceInApt.toString());
+    setAmount(tokenBalance.toString());
+  };
+
+  const handleSelectContact = (contact: Contact) => {
+    // Use email if available, otherwise use address
+    const contactIdentifier = contact.email || contact.address || '';
+    setRecipient(contactIdentifier);
+    setShowContacts(false);
   };
 
   return (
@@ -151,10 +187,19 @@ const SendScreen: React.FC<SendScreenProps> = ({ onClose, initialAddress = null 
         <div className="flex flex-col space-y-4">
           <div className="bg-white p-4 rounded-xl shadow-sm">
             <div className="flex flex-col space-y-2">
-              <label className="text-sm font-medium text-gray-600">
-                {isEmailMode ? "Recipient Email" : "Recipient Address or Email"}
-              </label>
-              
+              <div className="flex justify-between items-center">
+                <label className="text-sm font-medium text-gray-600">
+                  {isEmailMode ? "Recipient Email" : "Recipient Address or Email"}
+                </label>
+                <button
+                  onClick={() => setShowContacts(true)}
+                  className="flex items-center gap-1 text-sm text-blue-500 hover:text-blue-600"
+                >
+                  <User className="h-4 w-4" />
+                  <span>Contacts</span>
+                </button>
+              </div>
+
               <div className="relative">
                 <input
                   type="text"
@@ -204,7 +249,7 @@ const SendScreen: React.FC<SendScreenProps> = ({ onClose, initialAddress = null 
               
               {isEmailMode && emailExists === true && (
                 <p className="text-xs text-green-500 mt-1">
-                  User found. APT will be sent to their associated address.
+                  User found. STX will be sent to their associated address.
                 </p>
               )}
             </div>
@@ -272,6 +317,16 @@ const SendScreen: React.FC<SendScreenProps> = ({ onClose, initialAddress = null 
           )}
         </button>
       </div>
+
+      {/* Contacts Modal */}
+      {showContacts && (
+        <div className="fixed inset-0 z-50 bg-white">
+          <ContactsList
+            onSelectContact={handleSelectContact}
+            onClose={() => setShowContacts(false)}
+          />
+        </div>
+      )}
     </div>
   );
 };

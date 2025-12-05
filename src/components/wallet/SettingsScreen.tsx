@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useWeb3Auth } from "@/context/Web3AuthContext";
+import { useGoogleAuth } from "@/context/GoogleAuthContext";
+import { storage } from "@/utils/storage";
 import { getUserByEmail } from "@/utils/supabase";
 import AnimatedView from "@/components/ui/AnimatedView";
 import AgentLimitsPanel from './AgentLimitsPanel';
@@ -173,8 +174,8 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({ onBack, userInfo, walletAdd
 };
 
 const SecuritySection: React.FC<SecuritySectionProps> = ({ onBack }) => {
-  const { getPrivateKey } = useWeb3Auth();
   const [privateKey, setPrivateKey] = useState<string | null>(null);
+  const [mnemonic, setMnemonic] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -183,11 +184,19 @@ const SecuritySection: React.FC<SecuritySectionProps> = ({ onBack }) => {
   const fetchPrivateKey = async () => {
     if (privateKey) return; // Already fetched
     if (!confirmed) return; // Not confirmed yet
-    
+
     setIsLoading(true);
     try {
-      const key = await getPrivateKey();
-      setPrivateKey(key);
+      // Get private key and mnemonic from storage
+      const storedPrivateKey = storage.getString('privateKey');
+      const storedMnemonic = storage.getString('mnemonic');
+
+      if (storedPrivateKey) {
+        setPrivateKey(storedPrivateKey);
+      }
+      if (storedMnemonic) {
+        setMnemonic(storedMnemonic);
+      }
     } catch (error) {
       console.error("Error fetching private key:", error);
     } finally {
@@ -290,36 +299,37 @@ const SecuritySection: React.FC<SecuritySectionProps> = ({ onBack }) => {
             {isLoading ? (
               <LoadingSpinner />
             ) : (
-              <div className="bg-white rounded-xl p-5 shadow-sm animate-fadeIn">
-                <h3 className="font-medium text-gray-800 mb-2">Your Private Key</h3>
-                <div className="bg-gray-100 p-4 rounded-lg mb-3 animate-slideUp" style={{animationDelay: "0.1s"}}>
-                  <div className="flex items-center justify-between mb-2">
-                    <p className="text-xs text-gray-500">For recovery purposes only</p>
-                    <button 
-                      onClick={handleToggleVisibility}
-                      className="text-xs text-blue-600 font-medium hover:text-blue-700 transition-colors px-2 py-1 rounded hover:bg-blue-50"
-                    >
-                      {isVisible ? "Hide" : "Show"}
-                    </button>
+              <div className="space-y-4 animate-fadeIn">
+                {/* Private Key Section */}
+                <div className="bg-white rounded-xl p-5 shadow-sm">
+                  <h3 className="font-medium text-gray-800 mb-2">Your Private Key</h3>
+                  <div className="bg-gray-100 p-4 rounded-lg mb-3 animate-slideUp" style={{animationDelay: "0.1s"}}>
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-xs text-gray-500">For recovery purposes only</p>
+                      <button
+                        onClick={handleToggleVisibility}
+                        className="text-xs text-blue-600 font-medium hover:text-blue-700 transition-colors px-2 py-1 rounded hover:bg-blue-50"
+                      >
+                        {isVisible ? "Hide" : "Show"}
+                      </button>
+                    </div>
+
+                    <p className={`break-all font-mono text-xs ${isVisible ? "text-gray-800" : "text-gray-500"} transition-colors duration-200`}>
+                      {privateKey ? (isVisible ? privateKey : formatPrivateKey(privateKey)) : "No private key found"}
+                    </p>
                   </div>
-                  
-                  <p className={`break-all font-mono text-sm ${isVisible ? "text-gray-800" : "text-gray-500"} transition-colors duration-200`}>
-                    {privateKey ? formatPrivateKey(privateKey) : "Unable to retrieve private key"}
-                  </p>
-                </div>
-                
-                <div className="flex flex-col space-y-3 animate-slideUp" style={{animationDelay: "0.2s"}}>
+
                   <button
                     onClick={handleCopyToClipboard}
                     disabled={!privateKey}
-                    className="p-3 rounded-lg bg-blue-50 text-blue-600 text-sm font-medium hover:bg-blue-100 transition-all flex items-center justify-center transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full p-3 rounded-lg bg-blue-50 text-blue-600 text-sm font-medium hover:bg-blue-100 transition-all flex items-center justify-center transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {copied ? (
                       <>
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
                           <path d="M20 6L9 17l-5-5"></path>
                         </svg>
-                        Copied to clipboard
+                        Copied!
                       </>
                     ) : (
                       <>
@@ -327,16 +337,45 @@ const SecuritySection: React.FC<SecuritySectionProps> = ({ onBack }) => {
                           <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                           <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                         </svg>
-                        Copy to clipboard
+                        Copy Private Key
                       </>
                     )}
                   </button>
                 </div>
-                
-                <div className="mt-5 text-red-600 p-4 bg-red-50 rounded-lg text-sm animate-slideUp" style={{animationDelay: "0.3s"}}>
+
+                {/* Mnemonic Section */}
+                {mnemonic && (
+                  <div className="bg-white rounded-xl p-5 shadow-sm animate-slideUp" style={{animationDelay: "0.2s"}}>
+                    <h3 className="font-medium text-gray-800 mb-2">Recovery Phrase (Mnemonic)</h3>
+                    <div className="bg-gray-100 p-4 rounded-lg mb-3">
+                      <p className="text-xs text-gray-500 mb-2">24-word recovery phrase</p>
+                      <p className={`font-mono text-xs leading-relaxed ${isVisible ? "text-gray-800" : "text-gray-500"} transition-colors duration-200`}>
+                        {isVisible ? mnemonic : "••••••• ••••••• ••••••• ••••••• ••••••• •••••••"}
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(mnemonic);
+                        setCopied(true);
+                        setTimeout(() => setCopied(false), 2000);
+                      }}
+                      className="w-full p-3 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition-all flex items-center justify-center"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                      </svg>
+                      Copy Recovery Phrase
+                    </button>
+                  </div>
+                )}
+
+                {/* Warning Section */}
+                <div className="text-red-600 p-4 bg-red-50 rounded-lg text-sm animate-slideUp" style={{animationDelay: "0.3s"}}>
                   <p className="font-medium mb-1">Important:</p>
                   <ul className="list-disc pl-5 space-y-1">
-                    <li>Never share your private key with anyone</li>
+                    <li>Never share your private key or recovery phrase with anyone</li>
                     <li>Never enter it on websites or apps</li>
                     <li>If someone asks for it, they're trying to scam you</li>
                     <li>Store it securely in an encrypted password manager</li>
@@ -352,7 +391,7 @@ const SecuritySection: React.FC<SecuritySectionProps> = ({ onBack }) => {
 };
 
 const SettingsScreen: React.FC<SettingsScreenProps> = ({ onClose, onLogout }) => {
-  const { userInfo, aptosAddress } = useWeb3Auth();
+  const { userInfo, walletAddress } = useGoogleAuth();
   const [language, setLanguage] = useState("English");
   const [showPersonalInfo, setShowPersonalInfo] = useState(false);
   const [showSecurity, setShowSecurity] = useState(false);
@@ -603,10 +642,10 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onClose, onLogout }) =>
       
       {/* Vistas animadas */}
       <AnimatedView show={isViewActive("personal")} direction="right">
-        <PersonalInfo 
-          onBack={() => handleCloseView("personal")} 
-          userInfo={userInfo} 
-          walletAddress={aptosAddress}
+        <PersonalInfo
+          onBack={() => handleCloseView("personal")}
+          userInfo={userInfo}
+          walletAddress={walletAddress}
         />
       </AnimatedView>
       

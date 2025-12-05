@@ -13,7 +13,7 @@ const SwapScreen: React.FC<SwapScreenProps> = ({ onClose }) => {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
   
-  // Mock exchange rate: 1 APT = 10 GoPay Token
+  // Mock exchange rate: 1 APT = 10 Movya Token
   const exchangeRate = 10;
   
   const handleFromAmountChange = (value: string) => {
