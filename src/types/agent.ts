@@ -1,34 +1,104 @@
-/**
- * Tipos relacionados con la configuración del agente
- */
-
-export interface AgentLimits {
-  id?: number;
-  user_address: string;              // Dirección del usuario dueño de esta configuración
-  max_tokens_per_tx: number;         // Cantidad máxima de tokens por transacción
-  daily_tx_limit: number;            // Límite diario de transacciones
-  max_tx_per_day: number;            // Número máximo de transacciones por día
-  monthly_tx_limit: number;          // Límite mensual de transacciones
-  whitelist_addresses: string[];     // Lista blanca de direcciones permitidas
-  created_at?: string;
-  updated_at?: string;
+// Interactive elements types
+export interface ChatAction {
+  type: 'button' | 'link' | 'transaction_link';
+  label: string;
+  value: string;
+  style?: 'primary' | 'secondary' | 'success' | 'warning' | 'danger';
+  url?: string;
 }
 
-export interface AgentTransaction {
-  id?: number;
-  from_address: string;
-  to_address: string;
-  amount: number;
-  token_type: string;
-  tx_hash?: string;
-  status: 'pending' | 'success' | 'rejected' | 'error';
-  created_at?: string;
+export interface RichContent {
+  type: 'transaction_details' | 'balance_info' | 'contact_info';
+  data: {
+    transactionHash?: string;
+    amount?: string;
+    currency?: string;
+    usdValue?: string;
+    recipient?: string;
+    recipientNickname?: string;
+    explorerUrl?: string;
+    balance?: string;
+    tokens?: Array<{ symbol: string; balance: string; usdValue: string }>;
+  };
 }
 
-export const DEFAULT_AGENT_LIMITS: Omit<AgentLimits, 'user_address'> = {
-  max_tokens_per_tx: 100,            // 100 tokens máximo por transacción
-  daily_tx_limit: 1000,              // 1000 tokens máximo por día
-  max_tx_per_day: 5,                 // 5 transacciones máximo por día
-  monthly_tx_limit: 10000,           // 10000 tokens máximo por mes
-  whitelist_addresses: [],           // Sin direcciones en lista blanca por defecto
-}; 
+// Agent Response and Action Types
+export interface AIResponse {
+  action: 'SEND' | 'CHECK_BALANCE' | 'VIEW_HISTORY' | 'SWAP' | 'CLARIFY' | 'GREETING' | 'ERROR';
+  parameters: {
+    recipientEmail: string | null;
+    recipientAddress: string | null;
+    amount: string | null;
+    currency: string | null;
+    fromCurrency?: string | null;
+    toCurrency?: string | null;
+  } | null;
+  confirmationRequired: boolean;
+  confirmationMessage: string | null;
+  responseMessage: string;
+  // New interactive fields
+  quickActions?: ChatAction[];
+  richContent?: RichContent;
+  expectsResponse?: boolean;
+}
+
+export interface AgentServiceResponse {
+  responseMessage: string;
+  newState: AIResponse | null;
+  actionDetails: {
+    type: 'SEND_TRANSACTION' | 'FETCH_BALANCE' | 'FETCH_HISTORY' | 'SWAP' | null;
+    recipientAddress?: string | null;
+    recipientEmail?: string | null;
+    amount?: string | null;
+    currency?: string | null;
+    fromCurrency?: string | null;
+    toCurrency?: string | null;
+  } | null;
+}
+
+export interface ActionResultInput {
+  actionType: 'SEND_TRANSACTION' | 'FETCH_BALANCE' | 'FETCH_HISTORY' | 'SWAP';
+  status: 'success' | 'failure';
+  data: {
+    // Transaction success data
+    transactionHash?: string;
+    amountSent?: string;
+    currencySent?: string;
+    recipient?: string;
+
+    // Balance success data
+    balance?: string;
+
+    // History success data
+    history?: Array<{
+      date: string;
+      type: 'sent' | 'received';
+      amount: string;
+      recipientOrSender: string;
+    }>;
+
+    // Swap success data
+    fromAmount?: string;
+    fromToken?: string;
+    toAmount?: string;
+    toToken?: string;
+    gasUsed?: string;
+
+    // Error data
+    errorCode?: string;
+    errorMessage?: string;
+  };
+}
+
+// Message type for chat UI
+export interface ChatMessage {
+  id: string;
+  text: string;
+  sender: 'user' | 'agent';
+  timestamp: number;
+  actionRequired?: AgentServiceResponse['actionDetails'];
+  conversationId?: string;
+  // Interactive elements
+  quickActions?: ChatAction[];
+  richContent?: RichContent;
+}

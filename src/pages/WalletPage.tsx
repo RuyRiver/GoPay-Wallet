@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
 import WalletScreen from "@/components/wallet/WalletScreen";
-import { useWeb3Auth } from "@/context/Web3AuthContext";
+import { useGoogleAuth } from "@/context/GoogleAuthContext";
 import { useNavigate } from "react-router-dom";
 import Spinner from "@/components/common/Spinner";
 
 const WalletPage: React.FC = () => {
-  const { isLoggedIn, isInitialized, isLoading } = useWeb3Auth();
+  const { isLoggedIn, isInitialized, isLoading } = useGoogleAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -17,7 +17,7 @@ const WalletPage: React.FC = () => {
   // Show loading spinner while checking login state
   if (isLoading || !isInitialized) {
     return (
-      <div className="h-[100dvh] flex items-center justify-center bg-gray-100">
+      <div className="flex items-center justify-center min-h-[932px]">
         <Spinner />
       </div>
     );
@@ -28,11 +28,7 @@ const WalletPage: React.FC = () => {
     return null; // Will redirect via useEffect
   }
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-      <WalletScreen />
-    </div>
-  );
+  return <WalletScreen />;
 };
 
 export default WalletPage;

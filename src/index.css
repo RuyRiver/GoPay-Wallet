@@ -101,8 +101,9 @@
 
   body {
     @apply bg-background text-foreground;
-    /* Ensure content is safe from browser UI elements */
-    padding-bottom: max(env(safe-area-inset-bottom, 0px), var(--mobile-browser-bar-height));
+    /* Remove default padding - handled by MobileLayout */
+    padding: 0;
+    margin: 0;
   }
 }
 
@@ -131,6 +132,16 @@
 .h-85vh-real {
   height: 85vh; /* Fallback */
   height: calc(var(--vh, 1vh) * 85);
+}
+
+.h-95vh-real {
+  height: 95vh; /* Fallback */
+  height: calc(var(--vh, 1vh) * 95);
+}
+
+.h-98vh-real {
+  height: 98vh; /* Fallback */
+  height: calc(var(--vh, 1vh) * 98);
 }
 
 /* Safe area inset utilities */
@@ -165,7 +176,7 @@
 /* Sticky elements that need to stay above the browser UI */
 .sticky-safe-bottom {
   position: sticky;
-  bottom: max(env(safe-area-inset-bottom, 0px), var(--mobile-browser-bar-height));
+  bottom: 0;
   z-index: 40;
   background-color: white;
 }
@@ -182,16 +193,20 @@ html, body {
   .h-screen, .min-h-screen, .max-h-screen {
     height: -webkit-fill-available;
   }
-  
-  /* Add padding at the bottom to account for the browser's toolbar */
-  body {
-    padding-bottom: env(safe-area-inset-bottom, var(--mobile-browser-bar-height));
+}
+
+/* Slide up animation for modals */
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
   }
 }
 
-/* Fix for Chrome/Safari on iOS */
-@supports (padding: max(0px)) {
-  body {
-    padding-bottom: max(env(safe-area-inset-bottom, 0px), var(--mobile-browser-bar-height));
-  }
+.animate-slide-up {
+  animation: slideUp 0.3s ease-out;
 }

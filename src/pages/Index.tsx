@@ -1,10 +1,10 @@
 import { StartScreen } from "@/components/start-screen/StartScreen";
-import { useWeb3Auth } from "@/context/Web3AuthContext";
+import { useGoogleAuth } from "@/context/GoogleAuthContext";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Index = () => {
-  const { isLoggedIn, isInitialized } = useWeb3Auth();
+  const { isLoggedIn, isInitialized } = useGoogleAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -14,9 +14,7 @@ const Index = () => {
   }, [isLoggedIn, isInitialized, navigate]);
 
   return (
-    <main className="h-[100dvh] flex items-center justify-center bg-gray-100">
-      <StartScreen />
-    </main>
+    <StartScreen />
   );
 };
 
