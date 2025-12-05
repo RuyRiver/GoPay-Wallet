@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { storage } from '../utils/storage';
+import { requestCustomFaucet } from '../services/faucetService';
 
 // Backend URL from environment
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://movya-wallet-backend-413658817628.us-central1.run.app';
@@ -8,36 +9,24 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://movya-wallet-ba
 const NETWORK = import.meta.env.VITE_STACKS_NETWORK || 'mainnet';
 
 /**
- * Request testnet STX from faucet
+ * Request testnet STX from custom faucet
  * Only works on testnet network
  */
-const requestFaucet = async (address: string, userId: string): Promise<boolean> => {
+const requestFaucet = async (address: string): Promise<boolean> => {
   if (NETWORK !== 'testnet') {
     console.log('Faucet only available on testnet');
     return false;
   }
 
   try {
-    console.log('Requesting faucet for address:', address);
-    const response = await fetch(`${BACKEND_URL}/faucet`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        network: 'testnet',
-        address,
-        userId,
-      }),
-    });
+    console.log('Requesting custom faucet for address:', address);
+    const result = await requestCustomFaucet(address);
 
-    if (response.ok) {
-      const data = await response.json();
-      console.log('Faucet request successful:', data);
+    if (result.success) {
+      console.log('Faucet request successful, txId:', result.txId);
       return true;
     } else {
-      const error = await response.json();
-      console.log('Faucet request failed:', error.error || error.message);
+      console.log('Faucet request failed:', result.error);
       return false;
     }
   } catch (error) {
@@ -113,9 +102,9 @@ export const GoogleAuthProvider = ({ children }: GoogleAuthProviderProps) => {
 
           // Fetch balance and request faucet if 0
           const currentBalance = await getBalance();
-          if (currentBalance === 0 && savedWalletAddress && savedUserId) {
+          if (currentBalance === 0 && savedWalletAddress) {
             console.log('Balance is 0 on init, requesting faucet...');
-            await requestFaucet(savedWalletAddress, savedUserId);
+            await requestFaucet(savedWalletAddress);
           }
         }
       } catch (error) {
@@ -198,7 +187,7 @@ export const GoogleAuthProvider = ({ children }: GoogleAuthProviderProps) => {
 
           // Request faucet for new wallet on testnet
           if (finalWalletAddress) {
-            await requestFaucet(finalWalletAddress, data.userId);
+            await requestFaucet(finalWalletAddress);
           }
         }
       }
@@ -227,7 +216,7 @@ export const GoogleAuthProvider = ({ children }: GoogleAuthProviderProps) => {
       const currentBalance = await getBalance();
       if (currentBalance === 0 && finalWalletAddress) {
         console.log('Balance is 0, requesting faucet...');
-        await requestFaucet(finalWalletAddress, data.userId);
+        await requestFaucet(finalWalletAddress);
       }
 
       console.log('Login successful:', data.walletAddress);
