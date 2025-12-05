@@ -69,8 +69,8 @@ const WalletScreen: React.FC = () => {
       // Could also show a notification here
     };
 
-    // Start monitoring for new transactions (poll every 30 seconds)
-    detectionService.startMonitoring(handleNewTransaction, 30000);
+    // Start monitoring for new transactions (poll every 10 seconds)
+    detectionService.startMonitoring(handleNewTransaction, 10000);
 
     // Stop monitoring on unmount
     return () => {

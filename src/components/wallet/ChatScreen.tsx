@@ -6,6 +6,8 @@ import type { AIResponse, AgentServiceResponse } from "@/types/agent";
 import ChatInput from "./ChatInput";
 import PortfolioService from "@/services/portfolioService";
 import { DEFAULT_NETWORK } from "@/constants/networks";
+import { send } from "@/services/sendTransaction";
+import { getExplorerUrl } from "@/constants/networks";
 
 interface ChatScreenProps {
   onClose: () => void;
@@ -235,7 +237,36 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onClose, initialMessage }) => {
         );
         return `Here's your current balance:\n\n${lines.join('\n')}\n\n💰 Total: $${portfolio.totalValueUSD.toFixed(2)} USD`;
       }
-      // Add more action types as needed
+
+      if (actionDetails.type === 'SEND_TRANSACTION') {
+        // actionDetails has fields directly, not nested in data
+        const recipient = actionDetails.recipientAddress || actionDetails.recipientEmail;
+        const amount = actionDetails.amount;
+        const token = actionDetails.currency || 'STX';
+
+        console.log('[ChatScreen] SEND_TRANSACTION actionDetails:', actionDetails);
+
+        if (!recipient || !amount) {
+          return '❌ Missing transaction details. Please try again.';
+        }
+
+        console.log('[ChatScreen] Executing SEND_TRANSACTION:', { recipient, amount, token });
+
+        try {
+          const txHash = await send(recipient, amount.toString(), token);
+          const explorerUrl = getExplorerUrl(txHash, DEFAULT_NETWORK.id);
+
+          return `✅ Transaction sent successfully!\n\n` +
+            `Amount: ${amount} ${token}\n` +
+            `To: ${recipient}\n` +
+            `Tx: ${txHash.substring(0, 10)}...\n\n` +
+            `View on explorer: ${explorerUrl}`;
+        } catch (txError: any) {
+          console.error('[ChatScreen] Transaction error:', txError);
+          return `❌ Transaction failed: ${txError.message || 'Unknown error'}`;
+        }
+      }
+
       return null;
     } catch (error) {
       console.error('[ChatScreen] Action error:', error);
