@@ -1,11 +1,12 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Supabase configuration
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://placeholder.supabase.co';
 // Using anon key from environment variables
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'placeholder-key';
 
-// Initialize Supabase client
+// Initialize Supabase client (conditional - only used if variables are set)
+// Note: We're migrating to Movya backend, so Supabase is being phased out
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
 /**
