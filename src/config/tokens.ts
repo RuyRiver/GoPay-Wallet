@@ -1,4 +1,4 @@
-// Token configuration file for GoPay wallet
+// Token configuration file for Movya wallet
 
 export interface Token {
   symbol: string;         // Token symbol (e.g., APT)
