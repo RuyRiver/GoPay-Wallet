@@ -13,6 +13,7 @@ import SettingsScreen from "./SettingsScreen";
 import AnimatedView from "@/components/ui/AnimatedView";
 import { useGoogleAuth } from "@/context/GoogleAuthContext";
 import PortfolioService, { type Portfolio } from "@/services/portfolioService";
+import { DEFAULT_NETWORK } from "@/constants/networks";
 import TransactionDetectionService from "@/services/transactionDetectionService";
 import TransactionHistory from "./TransactionHistory";
 import { type Contact } from "@/services/contactsService";
@@ -33,7 +34,7 @@ const WalletScreen: React.FC = () => {
   const loadPortfolio = async () => {
     try {
       setIsLoadingPortfolio(true);
-      const portfolioData = await PortfolioService.getPortfolio('mainnet');
+      const portfolioData = await PortfolioService.getPortfolio(DEFAULT_NETWORK.id);
       setPortfolio(portfolioData);
       console.log('[WalletScreen] Portfolio loaded:', portfolioData);
     } catch (error) {

@@ -5,6 +5,7 @@ import { useGoogleAuth } from "@/context/GoogleAuthContext";
 import type { AIResponse, AgentServiceResponse } from "@/types/agent";
 import ChatInput from "./ChatInput";
 import PortfolioService from "@/services/portfolioService";
+import { DEFAULT_NETWORK } from "@/constants/networks";
 
 interface ChatScreenProps {
   onClose: () => void;
@@ -228,7 +229,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onClose, initialMessage }) => {
 
     try {
       if (actionDetails.type === 'FETCH_BALANCE') {
-        const portfolio = await PortfolioService.getPortfolio('mainnet');
+        const portfolio = await PortfolioService.getPortfolio(DEFAULT_NETWORK.id);
         const lines = portfolio.tokens.map(t =>
           `• ${t.symbol}: ${parseFloat(t.balance).toFixed(4)} ($${t.valueUSD.toFixed(2)})`
         );

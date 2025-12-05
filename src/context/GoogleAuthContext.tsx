@@ -179,8 +179,12 @@ export const GoogleAuthProvider = ({ children }: GoogleAuthProviderProps) => {
           const walletData = await walletResponse.json();
 
           // Backend returns: { success: true, wallet: { mainnet: { address }, testnet: { address }, privateKey, mnemonic } }
-          // Use mainnet address by default
-          finalWalletAddress = walletData.wallet?.mainnet?.address || walletData.wallet?.testnet?.address;
+          // Use address based on current network
+          if (NETWORK === 'testnet') {
+            finalWalletAddress = walletData.wallet?.testnet?.address;
+          } else {
+            finalWalletAddress = walletData.wallet?.mainnet?.address;
+          }
 
           // Store private key and mnemonic securely (don't log these!)
           if (walletData.wallet?.privateKey) {
