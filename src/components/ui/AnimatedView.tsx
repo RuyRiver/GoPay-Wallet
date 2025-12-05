@@ -8,15 +8,15 @@ interface AnimatedViewProps {
 
 /**
  * Componente para transiciones animadas entre vistas
- * 
+ *
  * @param show - Si se muestra la vista
  * @param children - Contenido a mostrar
  * @param direction - Dirección de la animación (right, left, up, down)
  */
-const AnimatedView: React.FC<AnimatedViewProps> = ({ 
-  show, 
-  children, 
-  direction = "right" 
+const AnimatedView: React.FC<AnimatedViewProps> = ({
+  show,
+  children,
+  direction = "right"
 }) => {
   const [mounted, setMounted] = useState(false);
   
@@ -52,28 +52,20 @@ const AnimatedView: React.FC<AnimatedViewProps> = ({
   }
   
   return (
-    <div 
-      className={`fixed inset-0 z-40 bg-gray-100/80 backdrop-blur-sm transition-all duration-700 ease-out ${
+    <div
+      className={`absolute inset-0 z-40 bg-gray-100/80 backdrop-blur-sm transition-all duration-700 ease-out ${
         show ? "opacity-100 pointer-events-auto animate-fade-in-up" : "opacity-0 pointer-events-none animate-fade-out-down"
       }`}
       style={{
-        perspective: '1000px',
-        height: 'calc(var(--vh, 1vh) * 100)'
+        perspective: '1000px'
       }}
     >
-      <div 
-        className={`fixed inset-0 flex items-center justify-center overflow-hidden`}
-        style={{
-          height: 'calc(var(--vh, 1vh) * 100)'
-        }}
-      >
-        <div 
-          className={`relative w-full max-w-md h-85vh-real bg-white flex flex-col overflow-hidden rounded-xl shadow-xl transition-all duration-700 ease-out transform ${show ? `${translateActiveClass} animate-spring-in-${direction}` : `${translateClass} animate-spring-out-${direction}`}`}
+      <div className="absolute inset-0 flex flex-col overflow-hidden">
+        <div
+          className={`flex-1 w-full bg-white flex flex-col overflow-hidden transition-all duration-700 ease-out transform ${show ? `${translateActiveClass}` : `${translateClass}`}`}
           style={{
             transformStyle: 'preserve-3d',
-            backfaceVisibility: 'hidden',
-            boxShadow: show ? '0 25px 50px -12px rgba(0, 0, 0, 0.25)' : '0 0 0 rgba(0, 0, 0, 0)',
-            animation: show ? 'pulse-shadow 2s ease-in-out infinite' : 'none'
+            backfaceVisibility: 'hidden'
           }}
         >
           {children}
